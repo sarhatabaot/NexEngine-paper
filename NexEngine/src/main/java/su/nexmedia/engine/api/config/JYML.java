@@ -527,7 +527,7 @@ public class JYML extends YamlConfiguration {
     public void setPluginItem(@NotNull String path, @NotNull ItemStack item) {
         PluginItem<?> pluginItem = PluginItemRegistry.fromItemStack(item);
         if (pluginItem == null) {
-            NexEngine.get().warn("Failed to write plugin item at: " + path);
+            NexEngine.get().warn("Failed to write plugin item reference at: " + path);
             return;
         }
         this.set(path, pluginItem.getPlugin() + ":" + pluginItem.getItemId());
