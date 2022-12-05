@@ -31,6 +31,7 @@ public final class PluginItemRegistry {
                 String itemId = Objects.requireNonNull(pluginItem.ofItemId(item));
                 pluginItem.setPlugin(plugin);
                 pluginItem.setItemId(itemId);
+                pluginItem.onConstruct();
                 return pluginItem;
             }
         }
