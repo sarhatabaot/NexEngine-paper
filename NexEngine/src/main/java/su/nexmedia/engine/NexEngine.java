@@ -7,13 +7,14 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.actions.ActionsManager;
 import su.nexmedia.engine.api.command.GeneralCommand;
+import su.nexmedia.engine.api.item.PluginItemRegistry;
 import su.nexmedia.engine.api.menu.MenuItemType;
 import su.nexmedia.engine.config.EngineConfig;
 import su.nexmedia.engine.craft.CraftManager;
 import su.nexmedia.engine.editor.EditorManager;
 import su.nexmedia.engine.hooks.HookManager;
 import su.nexmedia.engine.hooks.Hooks;
-import su.nexmedia.engine.hooks.external.VaultHook;
+import su.nexmedia.engine.hooks.external.*;
 import su.nexmedia.engine.hooks.external.citizens.CitizensHook;
 import su.nexmedia.engine.lang.EngineLang;
 import su.nexmedia.engine.manager.player.blocktracker.PlayerBlockTracker;
@@ -125,6 +126,15 @@ public class NexEngine extends NexPlugin<NexEngine> implements Listener {
         if (Hooks.hasVault()) {
             VaultHook.setup();
         }
+
+        if (Hooks.hasItemsAdder())
+            PluginItemRegistry.registerForConfig("itemsadder", ItemsAdderHook::new);
+        if (Hooks.hasMMOItems())
+            PluginItemRegistry.registerForConfig("mmoitems", MMOItemsHook::new);
+        if (Hooks.hasBrewery())
+            PluginItemRegistry.registerForConfig("brewery", BreweryHook::new);
+        if (Hooks.hasInteractiveBooks())
+            PluginItemRegistry.registerForConfig("interactivebooks", InteractiveBooksHook::new);
     }
 
     @Override

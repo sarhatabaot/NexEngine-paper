@@ -21,11 +21,15 @@ import java.util.stream.Collectors;
 
 public class Hooks {
 
-    public static final String VAULT           = "Vault";
-    public static final String CITIZENS        = "Citizens";
-    public static final String PLACEHOLDER_API = "PlaceholderAPI";
-    public static final String MYTHIC_MOBS     = "MythicMobs";
-    public static final String WORLD_GUARD     = "WorldGuard";
+    public static final String VAULT             = "Vault";
+    public static final String CITIZENS          = "Citizens";
+    public static final String PLACEHOLDER_API   = "PlaceholderAPI";
+    public static final String MYTHIC_MOBS       = "MythicMobs";
+    public static final String WORLD_GUARD       = "WorldGuard";
+    public static final String BREWERY           = "Brewery";
+    public static final String INTERACTIVE_BOOKS = "InteractiveBooks";
+    public static final String ITEMS_ADDER       = "ItemsAdder";
+    public static final String MMOITEMS          = "MMOItems";
 
     private static final NexEngine ENGINE = NexEngine.get();
 
@@ -109,6 +113,22 @@ public class Hooks {
 
     public static boolean hasWorldGuard() {
         return hasPlugin(WORLD_GUARD);
+    }
+
+    public static boolean hasBrewery() {
+        return hasPlugin(BREWERY);
+    }
+
+    public static boolean hasInteractiveBooks() {
+        return hasPlugin(INTERACTIVE_BOOKS);
+    }
+
+    public static boolean hasItemsAdder() {
+        return hasPlugin(ITEMS_ADDER);
+    }
+
+    public static boolean hasMMOItems() {
+        return hasPlugin(MMOITEMS);
     }
 
     @Deprecated

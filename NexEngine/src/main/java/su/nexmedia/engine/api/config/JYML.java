@@ -19,6 +19,8 @@ import su.nexmedia.engine.Version;
 import su.nexmedia.engine.actions.ActionManipulator;
 import su.nexmedia.engine.api.craft.CraftRecipe;
 import su.nexmedia.engine.api.craft.FurnaceRecipe;
+import su.nexmedia.engine.api.item.PluginItem;
+import su.nexmedia.engine.api.item.PluginItemRegistry;
 import su.nexmedia.engine.api.menu.MenuItem;
 import su.nexmedia.engine.api.menu.MenuItemDisplay;
 import su.nexmedia.engine.api.menu.MenuItemType;
@@ -513,6 +515,22 @@ public class JYML extends YamlConfiguration {
     public void setItemsEncoded(@NotNull String path, @NotNull List<ItemStack> item) {
         List<String> code = new ArrayList<>(ItemUtil.toBase64(item));
         this.set(path, code);
+    }
+
+    @Nullable
+    public ItemStack getPluginItem(@NotNull String path) {
+        String reference = this.getString(path);
+        PluginItem<?> pluginItem = PluginItemRegistry.fromConfig(reference);
+        return pluginItem != null ? pluginItem.createItemStack() : null;
+    }
+
+    public void setPluginItem(@NotNull String path, @NotNull ItemStack item) {
+        PluginItem<?> pluginItem = PluginItemRegistry.fromItemStack(item);
+        if (pluginItem == null) {
+            NexEngine.get().warn("Failed to write plugin item at: " + path);
+            return;
+        }
+        this.set(path, pluginItem.getPlugin() + ":" + pluginItem.getItemId());
     }
 
     @Nullable
