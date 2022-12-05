@@ -47,7 +47,7 @@ public class BreweryHook extends PluginItem<BRecipe> {
 
     @Override
     public boolean belongs(@NotNull ItemStack item) {
-        return BreweryApi.getBrew(item) != null;
+        return BreweryApi.isBrew(item);
     }
 
     @Override
