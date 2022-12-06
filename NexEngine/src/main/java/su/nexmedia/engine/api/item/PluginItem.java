@@ -60,6 +60,15 @@ public abstract class PluginItem<T> {
     }
 
     /**
+     * Creates the config reference of this Plugin Item.
+     *
+     * @return config reference of this Plugin Item
+     */
+    public @NotNull String asReference() {
+        return getPlugin() + ":" + getItemId();
+    }
+
+    /**
      * Gets an instance of the plugin item from the external plugin codebase. The implementation is expected to use
      * {@link #getPlugin()} and {@link #getItemId()} to get the specific plugin item instance from the database of the
      * external plugin.

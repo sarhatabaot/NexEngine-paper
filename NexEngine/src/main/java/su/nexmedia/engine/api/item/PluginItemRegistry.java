@@ -23,7 +23,8 @@ public final class PluginItemRegistry {
         constructors.remove(pluginId.toLowerCase());
     }
 
-    public static @Nullable PluginItem<?> fromItemStack(ItemStack item) {
+    public static @Nullable PluginItem<?> fromItemStackNullable(@Nullable ItemStack item) {
+        if (item == null) return null;
         for (Map.Entry<String, Supplier<PluginItem<?>>> entry : constructors.entrySet()) {
             PluginItem<?> pluginItem = entry.getValue().get();
             if (pluginItem.belongs(item)) {
@@ -38,7 +39,14 @@ public final class PluginItemRegistry {
         return null;
     }
 
-    public static @Nullable PluginItem<?> fromConfig(@NotNull String plugin, @NotNull String itemId) {
+    public static @NotNull PluginItem<?> fromItemStack(@NotNull ItemStack item) {
+        PluginItem<?> pluginItem = fromItemStackNullable(item);
+        if (pluginItem == null) throw new NullPointerException();
+        return pluginItem;
+    }
+
+    public static @Nullable PluginItem<?> fromConfigNullable(@Nullable String plugin, @Nullable String itemId) {
+        if (plugin == null || itemId == null) return null;
         plugin = plugin.toLowerCase();
         itemId = itemId.toLowerCase();
         if (constructors.containsKey(plugin)) {
@@ -48,28 +56,36 @@ public final class PluginItemRegistry {
             item.onConstruct();
             return item;
         }
-        NexEngine.get().error("Unsupported plugin item '" + itemId + "' from plugin '" + plugin + "'."
+        NexEngine.get().error("Unsupported plugin item '" + itemId + "' from external plugin '" + plugin + "'."
                               + " Remove this config line if you don't have the external plugin installed");
         return null;
     }
 
-    public static @Nullable PluginItem<?> fromConfig(String reference) {
+    public static @NotNull PluginItem<?> fromConfig(@NotNull String plugin, @NotNull String itemId) {
+        return Objects.requireNonNull(fromConfigNullable(plugin, itemId));
+    }
+
+    public static @Nullable PluginItem<?> fromConfigNullable(@Nullable String reference) {
         if (!isPluginItemId(reference)) {
-            NexEngine.get().error("The format of plugin item ID '" + reference + "' is not correct");
+            NexEngine.get().error("The format of plugin item ID '" + reference + "' is not correct. Correct format: {plugin}:{itemId}");
             return null;
         }
         String[] split = toPluginItemId(reference);
         return fromConfig(split[0], split[1]);
     }
 
-    public static @Nullable String toReference(ItemStack item) {
-        PluginItem<?> pluginItem = fromItemStack(item);
+    public static @NotNull PluginItem<?> fromConfig(@NotNull String reference) {
+        return Objects.requireNonNull(fromConfigNullable(reference));
+    }
+
+    public static @Nullable String toReference(@Nullable ItemStack item) {
+        PluginItem<?> pluginItem = fromItemStackNullable(item);
         if (pluginItem == null) return null;
         return pluginItem.getPlugin() + ":" + pluginItem.getItemId();
     }
 
-    public static boolean isPluginItemId(String reference) {
-        return toPluginItemId(reference).length == 2;
+    public static boolean isPluginItemId(@Nullable String reference) {
+        return reference != null && toPluginItemId(reference).length == 2;
     }
 
     @Contract(pure = true)
