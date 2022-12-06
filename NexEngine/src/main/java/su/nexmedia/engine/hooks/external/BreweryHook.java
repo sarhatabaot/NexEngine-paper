@@ -41,8 +41,9 @@ public class BreweryHook extends PluginItem<BRecipe> {
     public boolean matches(@NotNull ItemStack item) {
         Brew brew = BreweryApi.getBrew(item);
         if (brew == null) return false;
-        String recipeName = brew.getCurrentRecipe().getName(brew.getQuality());
-        return recipeName.equalsIgnoreCase(getItemId());
+        String otherRecipe = brew.getCurrentRecipe().getName(brew.getQuality());
+        String thisRecipe = getItemId().split("~")[0];
+        return otherRecipe.equalsIgnoreCase(thisRecipe);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class BreweryHook extends PluginItem<BRecipe> {
     public @Nullable String ofItemId(@NotNull ItemStack item) {
         Brew brew = BreweryApi.getBrew(item);
         if (brew == null) return null;
-        String recipeName = brew.getCurrentRecipe().getRecipeName();
+        String recipeName = brew.getCurrentRecipe().getName(brew.getQuality());
         int brewQuality = brew.getQuality();
         return (recipeName + "~" + brewQuality).toLowerCase(Locale.ROOT);
     }
