@@ -520,17 +520,17 @@ public class JYML extends YamlConfiguration {
     @Nullable
     public ItemStack getPluginItem(@NotNull String path) {
         String reference = this.getString(path);
-        PluginItem<?> pluginItem = PluginItemRegistry.fromConfig(reference);
+        PluginItem<?> pluginItem = PluginItemRegistry.fromConfigNullable(reference);
         return pluginItem != null ? pluginItem.createItemStack() : null;
     }
 
     public void setPluginItem(@NotNull String path, @NotNull ItemStack item) {
-        PluginItem<?> pluginItem = PluginItemRegistry.fromItemStack(item);
+        PluginItem<?> pluginItem = PluginItemRegistry.fromItemStackNullable(item);
         if (pluginItem == null) {
             NexEngine.get().warn("Failed to write plugin item reference at: " + path);
             return;
         }
-        this.set(path, pluginItem.getPlugin() + ":" + pluginItem.getItemId());
+        this.set(path, pluginItem.asReference());
     }
 
     @Nullable
