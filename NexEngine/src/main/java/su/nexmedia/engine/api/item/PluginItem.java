@@ -5,6 +5,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Represents a custom item from external plugins.
+ *
+ * @param <T> the type of Plugin Item
+ */
 public abstract class PluginItem<T> {
 
     private String plugin;
@@ -23,6 +28,8 @@ public abstract class PluginItem<T> {
 
     /**
      * Gets the Plugin ID of this Plugin Item (always lowercase).
+     * <p>
+     * Usually it's the plugin name with all letters lowercase.
      *
      * @return the Plugin ID
      */
@@ -60,7 +67,9 @@ public abstract class PluginItem<T> {
     }
 
     /**
-     * Creates the config reference of this Plugin Item.
+     * Creates the full config reference of this Plugin Item.
+     * <p>
+     * A full config reference is in the format of "{pluginId}:{itemId}".
      *
      * @return config reference of this Plugin Item
      */
@@ -78,40 +87,40 @@ public abstract class PluginItem<T> {
     abstract public @Nullable T getPluginItem();
 
     /**
-     * @return the item stack generated from this plugin item
+     * @return the ItemStack generated from this plugin item
      */
     abstract public @Nullable ItemStack createItemStack();
 
     /**
-     * @return the item stack generated from this plugin item, varying depending on the given player
+     * @return the ItemStack generated from this plugin item, varying depending on the given player
      */
     abstract public @Nullable ItemStack createItemStack(@NotNull Player player);
 
     /**
-     * Check whether the specific itemStack matches this plugin item.
+     * Check whether the given ItemStack matches this plugin item.
      *
-     * @param item the itemStack to compare with
+     * @param item the ItemStack to compare with
      *
-     * @return true if the given itemStack is this plugin item, otherwise false
+     * @return true if the given ItemStack is this plugin item, otherwise false
      */
     abstract public boolean matches(@NotNull ItemStack item);
 
     /**
-     * Check whether the specific itemStack is from this plugin.
+     * Check whether the given ItemStack is from this plugin.
      *
-     * @param item the itemStack to compare with
+     * @param item the ItemStack to compare with
      *
-     * @return true if the given itemStack is from this plugin, otherwise false
+     * @return true if the given ItemStack is from this plugin, otherwise false
      */
     abstract public boolean belongs(@NotNull ItemStack item);
 
     /**
-     * Generate the config reference (format: {pluginName}:{itemId}) from the specific itemStack.
+     * Generate the config reference (only the part {pluginId}) from the given ItemStack.
      *
-     * @param item the itemStack to be converted into the config reference
+     * @param item the ItemStack to be converted into the config reference
      *
-     * @return the config reference from this itemStack, or <code>null</code> if this is not a custom plugin item
+     * @return the config reference from this ItemStack, or <code>null</code> if this is not a custom plugin item
      */
-    abstract public @Nullable String ofItemId(@NotNull ItemStack item);
+    abstract public @Nullable String toItemId(@NotNull ItemStack item);
 
 }

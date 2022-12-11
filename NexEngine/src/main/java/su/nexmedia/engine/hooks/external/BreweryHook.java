@@ -52,7 +52,7 @@ public class BreweryHook extends PluginItem<BRecipe> {
     }
 
     @Override
-    public @Nullable String ofItemId(@NotNull ItemStack item) {
+    public @Nullable String toItemId(@NotNull ItemStack item) {
         Brew brew = BreweryApi.getBrew(item);
         if (brew == null) return null;
         String recipeName = brew.getCurrentRecipe().getName(brew.getQuality());

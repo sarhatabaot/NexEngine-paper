@@ -40,7 +40,7 @@ public class ItemsAdderHook extends PluginItem<CustomStack> {
     }
 
     @Override
-    public @Nullable String ofItemId(@NotNull ItemStack item) {
+    public @Nullable String toItemId(@NotNull ItemStack item) {
         CustomStack stack = CustomStack.byItemStack(item);
         if (stack == null) return null;
         return stack.getNamespacedID();

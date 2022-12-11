@@ -1,12 +1,12 @@
 package su.nexmedia.engine.api.item;
 
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.NexEngine;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -28,8 +28,8 @@ public final class PluginItemRegistry {
         for (Map.Entry<String, Supplier<PluginItem<?>>> entry : constructors.entrySet()) {
             PluginItem<?> pluginItem = entry.getValue().get();
             if (pluginItem.belongs(item)) {
-                String plugin = Objects.requireNonNull(entry.getKey());
-                String itemId = Objects.requireNonNull(pluginItem.ofItemId(item));
+                String plugin = Objects.requireNonNull(entry.getKey()).toLowerCase(Locale.ROOT);
+                String itemId = Objects.requireNonNull(pluginItem.toItemId(item)).toLowerCase(Locale.ROOT);
                 pluginItem.setPlugin(plugin);
                 pluginItem.setItemId(itemId);
                 pluginItem.onConstruct();
@@ -39,13 +39,7 @@ public final class PluginItemRegistry {
         return null;
     }
 
-    public static @NotNull PluginItem<?> fromItemStack(@NotNull ItemStack item) {
-        PluginItem<?> pluginItem = fromItemStackNullable(item);
-        if (pluginItem == null) throw new NullPointerException();
-        return pluginItem;
-    }
-
-    public static @Nullable PluginItem<?> fromConfigNullable(@Nullable String plugin, @Nullable String itemId) {
+    public static @Nullable PluginItem<?> fromReferenceNullable(@Nullable String plugin, @Nullable String itemId) {
         if (plugin == null || itemId == null) return null;
         plugin = plugin.toLowerCase();
         itemId = itemId.toLowerCase();
@@ -61,21 +55,27 @@ public final class PluginItemRegistry {
         return null;
     }
 
-    public static @NotNull PluginItem<?> fromConfig(@NotNull String plugin, @NotNull String itemId) {
-        return Objects.requireNonNull(fromConfigNullable(plugin, itemId));
-    }
-
-    public static @Nullable PluginItem<?> fromConfigNullable(@Nullable String reference) {
+    public static @Nullable PluginItem<?> fromReferenceNullable(@Nullable String reference) {
         if (!isPluginItemId(reference)) {
             NexEngine.get().error("The format of plugin item ID '" + reference + "' is not correct. Correct format: {plugin}:{itemId}");
             return null;
         }
         String[] split = toPluginItemId(reference);
-        return fromConfig(split[0], split[1]);
+        return fromReference(split[0], split[1]);
     }
 
-    public static @NotNull PluginItem<?> fromConfig(@NotNull String reference) {
-        return Objects.requireNonNull(fromConfigNullable(reference));
+    public static @NotNull PluginItem<?> fromItemStack(@NotNull ItemStack item) {
+        PluginItem<?> pluginItem = fromItemStackNullable(item);
+        if (pluginItem == null) throw new NullPointerException();
+        return pluginItem;
+    }
+
+    public static @NotNull PluginItem<?> fromReference(@NotNull String plugin, @NotNull String itemId) {
+        return Objects.requireNonNull(fromReferenceNullable(plugin, itemId));
+    }
+
+    public static @NotNull PluginItem<?> fromReference(@NotNull String reference) {
+        return Objects.requireNonNull(fromReferenceNullable(reference));
     }
 
     public static @Nullable String toReference(@Nullable ItemStack item) {
@@ -88,8 +88,7 @@ public final class PluginItemRegistry {
         return reference != null && toPluginItemId(reference).length == 2;
     }
 
-    @Contract(pure = true)
-    private static @NotNull String[] toPluginItemId(@NotNull String reference) {
+    private static @NotNull String @NotNull [] toPluginItemId(@NotNull String reference) {
         return reference.split(":", 2);
     }
 

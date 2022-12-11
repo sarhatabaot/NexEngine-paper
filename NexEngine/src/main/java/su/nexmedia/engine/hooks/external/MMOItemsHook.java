@@ -65,7 +65,7 @@ public class MMOItemsHook extends PluginItem<MMOItemTemplate> {
     }
 
     @Override
-    public @Nullable String ofItemId(@NotNull ItemStack item) {
+    public @Nullable String toItemId(@NotNull ItemStack item) {
         NBTItem nbtItem = NBTItem.get(item);
         if (!nbtItem.hasType()) return null;
         String type = nbtItem.getType();

@@ -520,7 +520,7 @@ public class JYML extends YamlConfiguration {
     @Nullable
     public ItemStack getPluginItem(@NotNull String path) {
         String reference = this.getString(path);
-        PluginItem<?> pluginItem = PluginItemRegistry.fromConfigNullable(reference);
+        PluginItem<?> pluginItem = PluginItemRegistry.fromReferenceNullable(reference);
         return pluginItem != null ? pluginItem.createItemStack() : null;
     }
 

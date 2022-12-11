@@ -53,7 +53,7 @@ public class InteractiveBooksHook extends PluginItem<IBook> {
     }
 
     @Override
-    public @Nullable String ofItemId(@NotNull ItemStack item) {
+    public @Nullable String toItemId(@NotNull ItemStack item) {
         IBook book = InteractiveBooks.getBook(item);
         if (book == null) return null;
         return book.getId();
