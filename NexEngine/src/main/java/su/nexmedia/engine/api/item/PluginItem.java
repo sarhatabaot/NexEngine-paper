@@ -115,7 +115,7 @@ public abstract class PluginItem<T> {
     abstract public boolean belongs(@NotNull ItemStack item);
 
     /**
-     * Generate the config reference (only the part {pluginId}) from the given ItemStack.
+     * Generate the config reference (only the part {itemId}) from the given ItemStack.
      *
      * @param item the ItemStack to be converted into the config reference
      *
