@@ -101,7 +101,7 @@ public abstract class AbstractUserDataHandler<P extends NexPlugin<P>, U extends 
     }
 
     @NotNull
-    public List<@NotNull U> getUsers() {
+    public List<U> getUsers() {
         return this.getDatas(this.tableUsers, Collections.emptyMap(), this.getFunctionToUser(), -1);
     }
 

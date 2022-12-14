@@ -88,7 +88,7 @@ public final class PluginItemRegistry {
         return reference != null && toPluginItemId(reference).length == 2;
     }
 
-    private static @NotNull String @NotNull [] toPluginItemId(@NotNull String reference) {
+    private static @NotNull String[] toPluginItemId(@NotNull String reference) {
         return reference.split(":", 2);
     }
 

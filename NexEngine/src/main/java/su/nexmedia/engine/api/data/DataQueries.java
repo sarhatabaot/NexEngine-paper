@@ -34,7 +34,7 @@ public class DataQueries {
     }
 
     @NotNull
-    public static <T> List<@NotNull T> readData(@NotNull AbstractDataConnector connector,
+    public static <T> List<T> readData(@NotNull AbstractDataConnector connector,
                                                 @NotNull String table,
                                                 @NotNull Map<String, String> whereMap,
                                                 @NotNull Function<ResultSet, T> dataFunction,
@@ -43,7 +43,7 @@ public class DataQueries {
     }
 
     @NotNull
-    public static <T> List<@NotNull T> readData(@NotNull AbstractDataConnector connector,
+    public static <T> List<T> readData(@NotNull AbstractDataConnector connector,
                                                 @NotNull String table,
                                                 @NotNull Collection<String> columnsList,
                                                 @NotNull Map<String, String> whereMap,
@@ -143,7 +143,7 @@ public class DataQueries {
     }
 
     @NotNull
-    public static <T> List<@NotNull T> executeQuery(@NotNull AbstractDataConnector connector, @NotNull String sql,
+    public static <T> List<T> executeQuery(@NotNull AbstractDataConnector connector, @NotNull String sql,
                                                     @NotNull String table,
                                                     @NotNull Collection<String> values1,
                                                     @NotNull Function<ResultSet, T> dataFunction,

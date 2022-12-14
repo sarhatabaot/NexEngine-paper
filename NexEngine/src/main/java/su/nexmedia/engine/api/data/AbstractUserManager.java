@@ -126,12 +126,12 @@ public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends Abst
     }
 
     @NotNull
-    public Map<UUID, @NotNull U> getUsersLoadedMap() {
+    public Map<UUID, U> getUsersLoadedMap() {
         return this.usersLoaded;
     }
 
     @NotNull
-    public Collection<@NotNull U> getUsersLoaded() {
+    public Collection<U> getUsersLoaded() {
         return new HashSet<>(this.getUsersLoadedMap().values());
     }
 

@@ -255,7 +255,7 @@ public abstract class AbstractDataHandler<P extends NexPlugin<P>> extends Abstra
     }
 
     @NotNull
-    protected final <T> List<@NotNull T> getDatas(@NotNull String table,
+    protected final <T> List<T> getDatas(@NotNull String table,
                                                   @NotNull Map<String, String> whereMap,
                                                   @NotNull Function<ResultSet, T> dataFunction,
                                                   int amount) {
