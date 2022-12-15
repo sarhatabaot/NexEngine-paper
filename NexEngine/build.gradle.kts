@@ -14,6 +14,7 @@ plugins {
 
 dependencies {
     // NMS modules
+
     implementation(project(":NMS"))
     implementation(project(":NexEngineCompat_V1_17_R1", configuration = "reobf"))
     implementation(project(":NexEngineCompat_V1_18_R2", configuration = "reobf"))
@@ -21,18 +22,22 @@ dependencies {
     implementation(project(":NexEngineCompat_V1_19_R2", configuration = "reobf"))
 
     // Internal libraries
+
     compileOnly("com.zaxxer:HikariCP:5.0.1")
-    compileOnly("com.mojang:authlib:3.2.38")
+    compileOnly("com.mojang:authlib:3.16.29")
     compileOnly("io.netty:netty-all:4.1.85.Final")
     compileOnly("org.xerial:sqlite-jdbc:3.40.0.0")
-    compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("commons-lang:commons-lang:2.6")
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // 3rd party plugins
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
+        isTransitive = false
+    }
     compileOnly("io.lumine:Mythic-Dist:5.2.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6")
-    compileOnly("net.citizensnpcs:citizens-main:2.0.29-SNAPSHOT")
+    compileOnly("net.citizensnpcs:citizensapi:2.0.29-SNAPSHOT")
     compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
     compileOnly("net.Indyuce:MMOItems-API:6.8.3-SNAPSHOT")
     compileOnly("io.lumine:MythicLib-dist:1.3.4-SNAPSHOT")
@@ -55,6 +60,8 @@ bukkit {
 }
 
 tasks {
+    val outputFileName = "NexEngine-${project.version}"
+
     // Shadow settings
     build {
         dependsOn(shadowJar)
@@ -63,15 +70,15 @@ tasks {
         minimize {
             exclude(dependency("su.nexmedia:.*:.*"))
         }
-        archiveFileName.set("${project.name}.jar")
+        archiveFileName.set("$outputFileName.jar")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir"))
     }
     sourcesJar {
-        archiveFileName.set("${project.name}-source.jar")
+        archiveFileName.set("$outputFileName-source.jar")
     }
     javadocJar {
-        archiveFileName.set("${project.name}-javadoc.jar")
+        archiveFileName.set("$outputFileName-javadoc.jar")
     }
     jar {
         enabled = false

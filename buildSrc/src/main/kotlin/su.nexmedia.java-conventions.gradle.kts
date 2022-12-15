@@ -8,12 +8,18 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    mavenLocal() {
+        content {
+            includeGroup("net.leonardo_dgs")
+            includeGroup("com.github.DieReicheErethons")
+        }
+    }
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") {
         content {
             includeGroup("io.papermc.paper")
             includeGroup("net.md-5")
+            includeGroup("com.mojang")
         }
     }
     maven("https://jitpack.io") {
@@ -37,9 +43,12 @@ repositories {
     maven("https://maven.enginehub.org/repo/") {
         content {
             includeGroup("com.sk89q.worldguard")
+            includeGroup("com.sk89q.worldguard.worldguard-libs")
+            includeGroup("com.sk89q.worldedit")
+            includeGroup("com.sk89q.worldedit.worldedit-libs")
         }
     }
-    maven("https://repo.citizensnpcs.co/") {
+    maven("https://repo.citizensnpcs.co/#/") {
         content {
             includeGroup("net.citizensnpcs")
         }
