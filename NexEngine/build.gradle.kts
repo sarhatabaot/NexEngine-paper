@@ -60,6 +60,9 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
+        minimize {
+            exclude(dependency("su.nexmedia:.*:.*"))
+        }
         archiveFileName.set("${project.name}.jar")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir"))
