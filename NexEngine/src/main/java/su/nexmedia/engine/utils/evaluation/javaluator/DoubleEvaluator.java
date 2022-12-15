@@ -58,19 +58,19 @@ import java.util.Locale;
 public class DoubleEvaluator extends AbstractEvaluator<Double> {
 
     /**
-     * A constant that represents pi (3.14159...)
+     * A constant that represents {@code pi} (3.14159...)
      */
     public static final Constant PI = new Constant("pi");
     /**
-     * A constant that represents e (2.718281...)
+     * A constant that represents {@code e} (2.718281...)
      */
     public static final Constant E  = new Constant("e");
     /**
-     * Returns the smallest integer >= argument
+     * Returns the smallest integer {@code >=} argument
      */
     public static final Function CEIL  = new Function("ceil", 1);
     /**
-     * Returns the largest integer <= argument
+     * Returns the largest integer {@code <=} argument
      */
     public static final Function FLOOR = new Function("floor", 1);
     /**

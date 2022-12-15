@@ -210,7 +210,6 @@ public class Tokenizer {
      *                   expression we are evaluating).
      * @param candidates The candidate tokens.
      * @return A token
-     * @see #validateHomonyms(List)
      */
     protected Operator guessOperator(Token previous, List<Operator> candidates) {
         final int argCount = ((previous != null) && (previous.isCloseBracket() || previous.isLiteral())) ? 2 : 1;

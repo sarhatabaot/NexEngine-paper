@@ -10,19 +10,19 @@ package su.nexmedia.engine.utils.evaluation.javaluator;
 public class BracketPair {
 
     /**
-     * The parentheses pair: ().
+     * The parentheses pair: {@code ()}.
      */
     public static final BracketPair PARENTHESES = new BracketPair('(', ')');
     /**
-     * The square brackets pair: [].
+     * The square brackets pair: {@code []}.
      */
     public static final BracketPair BRACKETS    = new BracketPair('[', ']');
     /**
-     * The braces pair: {}.
+     * The braces pair: {@code {}}.
      */
     public static final BracketPair BRACES      = new BracketPair('{', '}');
     /**
-     * The angle brackets pair: <>.
+     * The angle brackets pair: {@code <>}.
      */
     public static final BracketPair ANGLES      = new BracketPair('<', '>');
 
