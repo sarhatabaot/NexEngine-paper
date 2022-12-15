@@ -16,10 +16,10 @@ dependencies {
     // NMS modules
 
     implementation(project(":NMS"))
-    implementation(project(":NexEngineCompat_V1_17_R1", configuration = "reobf"))
-    implementation(project(":NexEngineCompat_V1_18_R2", configuration = "reobf"))
-    implementation(project(":NexEngineCompat_V1_19_R1", configuration = "reobf"))
-    implementation(project(":NexEngineCompat_V1_19_R2", configuration = "reobf"))
+    runtimeOnly(project(":NexEngineCompat_V1_17_R1", configuration = "reobf"))
+    runtimeOnly(project(":NexEngineCompat_V1_18_R2", configuration = "reobf"))
+    runtimeOnly(project(":NexEngineCompat_V1_19_R1", configuration = "reobf"))
+    runtimeOnly(project(":NexEngineCompat_V1_19_R2", configuration = "reobf"))
 
     // Internal libraries
 

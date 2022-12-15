@@ -5,13 +5,13 @@
 
 # Build stuff
 
-buildSrc/build
-NexEngine/build
-NexEngineCompat_V1_17_R1/build
-NexEngineCompat_V1_18_R2/build
-NexEngineCompat_V1_19_R1/build
-NexEngineCompat_V1_19_R2/build
-NMS/build
+/buildSrc/build
+/NexEngine/build
+/NexEngineCompat_V1_17_R1/build
+/NexEngineCompat_V1_18_R2/build
+/NexEngineCompat_V1_19_R1/build
+/NexEngineCompat_V1_19_R2/build
+/NMS/build
 
 # Output jars
 
