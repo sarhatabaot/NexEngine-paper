@@ -15,4 +15,4 @@ NMS/build
 
 # Output jars
 
-NexEngine.jar
+/NexEngine*.jar

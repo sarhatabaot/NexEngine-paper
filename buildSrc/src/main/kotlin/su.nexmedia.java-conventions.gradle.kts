@@ -58,16 +58,12 @@ dependencies {
 group = "su.nexmedia"
 version = "2.2.7"
 
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-    }
-}
-
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 tasks {
