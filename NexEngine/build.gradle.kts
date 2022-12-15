@@ -16,10 +16,10 @@ dependencies {
     // NMS modules
 
     implementation(project(":NMS"))
-    runtimeOnly(project(":NexEngineCompat_V1_17_R1", configuration = "reobf"))
-    runtimeOnly(project(":NexEngineCompat_V1_18_R2", configuration = "reobf"))
-    runtimeOnly(project(":NexEngineCompat_V1_19_R1", configuration = "reobf"))
-    runtimeOnly(project(":NexEngineCompat_V1_19_R2", configuration = "reobf"))
+    implementation(project(":NexEngineCompat_V1_17_R1", configuration = "reobf"))
+    implementation(project(":NexEngineCompat_V1_18_R2", configuration = "reobf"))
+    implementation(project(":NexEngineCompat_V1_19_R1", configuration = "reobf"))
+    implementation(project(":NexEngineCompat_V1_19_R2", configuration = "reobf"))
 
     // Internal libraries
 
@@ -47,7 +47,7 @@ dependencies {
 }
 
 description = "NexEngine"
-version = "$version-SNAPSHOT".decorateVersion()
+version = "$version".decorateVersion()
 
 bukkit {
     main = "su.nexmedia.engine.NexEngine"

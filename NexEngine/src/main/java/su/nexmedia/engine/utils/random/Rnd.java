@@ -55,13 +55,13 @@ public class Rnd {
     }
 
     @Nullable
-    public static <T> T get(@NotNull Map<@NotNull T, Double> map) {
+    public static <T> T get(@NotNull Map<T, Double> map) {
         List<T> list = get(map, 1);
         return list.isEmpty() ? null : list.get(0);
     }
 
     @NotNull
-    public static <T> List<T> get(@NotNull Map<@NotNull T, Double> map, int amount) {
+    public static <T> List<T> get(@NotNull Map<T, Double> map, int amount) {
         map.values().removeIf(chance -> chance <= 0D);
         if (map.isEmpty()) return Collections.emptyList();
 

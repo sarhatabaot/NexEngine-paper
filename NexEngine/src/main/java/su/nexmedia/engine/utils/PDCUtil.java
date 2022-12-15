@@ -196,7 +196,7 @@ public class PDCUtil {
         }
 
         @Override
-        public byte @NotNull [] toPrimitive(double[] complex, @NotNull PersistentDataAdapterContext context) {
+        public @NotNull byte[] toPrimitive(double[] complex, @NotNull PersistentDataAdapterContext context) {
             ByteBuffer bb = ByteBuffer.allocate(complex.length * 8);
             for (double d : complex) {
                 bb.putDouble(d);
@@ -205,7 +205,7 @@ public class PDCUtil {
         }
 
         @Override
-        public double @NotNull [] fromPrimitive(byte @NotNull [] primitive, @NotNull PersistentDataAdapterContext context) {
+        public @NotNull double[] fromPrimitive(@NotNull byte[] primitive, @NotNull PersistentDataAdapterContext context) {
             ByteBuffer bb = ByteBuffer.wrap(primitive);
             DoubleBuffer dbuf = bb.asDoubleBuffer(); // Make DoubleBuffer
             double[] a = new double[dbuf.remaining()]; // Make an array of the correct size
@@ -236,7 +236,7 @@ public class PDCUtil {
         }
 
         @Override
-        public byte @NotNull [] toPrimitive(String[] strings, @NotNull PersistentDataAdapterContext itemTagAdapterContext) {
+        public @NotNull byte[] toPrimitive(String[] strings, @NotNull PersistentDataAdapterContext itemTagAdapterContext) {
             byte[][] allStringBytes = new byte[strings.length][];
             int total = 0;
             for (int i = 0; i < allStringBytes.length; i++) {
@@ -255,7 +255,7 @@ public class PDCUtil {
         }
 
         @Override
-        public String @NotNull [] fromPrimitive(byte @NotNull [] bytes, @NotNull PersistentDataAdapterContext itemTagAdapterContext) {
+        public @NotNull String[] fromPrimitive(@NotNull byte[] bytes, @NotNull PersistentDataAdapterContext itemTagAdapterContext) {
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             ArrayList<String> list = new ArrayList<>();
 
@@ -291,7 +291,7 @@ public class PDCUtil {
         }
 
         @Override
-        public byte @NotNull [] toPrimitive(UUID complex, @NotNull PersistentDataAdapterContext context) {
+        public @NotNull byte[] toPrimitive(UUID complex, @NotNull PersistentDataAdapterContext context) {
             ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
             bb.putLong(complex.getMostSignificantBits());
             bb.putLong(complex.getLeastSignificantBits());
@@ -299,7 +299,7 @@ public class PDCUtil {
         }
 
         @Override
-        public @NotNull UUID fromPrimitive(byte @NotNull [] primitive, @NotNull PersistentDataAdapterContext context) {
+        public @NotNull UUID fromPrimitive(@NotNull byte[] primitive, @NotNull PersistentDataAdapterContext context) {
             ByteBuffer bb = ByteBuffer.wrap(primitive);
             long firstLong = bb.getLong();
             long secondLong = bb.getLong();
