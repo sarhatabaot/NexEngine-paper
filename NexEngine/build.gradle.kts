@@ -25,8 +25,8 @@ dependencies {
     compileOnly("com.mojang:authlib:3.2.38")
     compileOnly("io.netty:netty-all:4.1.85.Final")
     compileOnly("org.xerial:sqlite-jdbc:3.40.0.0")
-    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // 3rd party plugins
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")

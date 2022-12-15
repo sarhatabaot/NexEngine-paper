@@ -7,11 +7,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
     compileOnly("io.netty:netty-all:4.1.85.Final")
 }
 
 description = "NMS"
-repositories {
-    mavenCentral()
-}
