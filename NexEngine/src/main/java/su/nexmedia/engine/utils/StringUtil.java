@@ -16,34 +16,29 @@ public class StringUtil {
 
     public static final Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]{6})");
 
-    @NotNull
-    public static String oneSpace(@NotNull String str) {
+    public static @NotNull String oneSpace(@NotNull String str) {
         return str.trim().replaceAll("\\s+", " ");
     }
 
-    @NotNull
-    public static String noSpace(@NotNull String str) {
+    public static @NotNull String noSpace(@NotNull String str) {
         return str.trim().replaceAll("\\s+", "");
     }
 
-    @NotNull
-    public static String color(@NotNull String str) {
+    public static @NotNull String color(@NotNull String str) {
         return colorHex(ChatColor.translateAlternateColorCodes('&', colorFix(str)));
     }
 
     /**
-     * Removes multiple color codes that are 'color of color'. Example: '&a&b&cText -> '&cText'.
+     * Removes multiple color codes that are 'color of color'. Example: {@code &a&b&cText} -> {@code &cText}.
      *
      * @param str String to fix.
      * @return A string with a proper color codes formatting.
      */
-    @NotNull
-    public static String colorFix(@NotNull String str) {
+    public static @NotNull String colorFix(@NotNull String str) {
         return NexEngine.get().getNMS().fixColors(str);
     }
 
-    @NotNull
-    public static Color parseColor(@NotNull String colorRaw) {
+    public static @NotNull Color parseColor(@NotNull String colorRaw) {
         String[] rgb = colorRaw.split(",");
         int red = StringUtil.getInteger(rgb[0], 0);
         if (red < 0) red = Rnd.get(255);
@@ -57,8 +52,7 @@ public class StringUtil {
         return Color.fromRGB(red, green, blue);
     }
 
-    @NotNull
-    public static String colorHex(@NotNull String str) {
+    public static @NotNull String colorHex(@NotNull String str) {
         Matcher matcher = HEX_PATTERN.matcher(str);
         StringBuilder buffer = new StringBuilder(str.length() + 4 * 8);
         while (matcher.find()) {
@@ -68,8 +62,7 @@ public class StringUtil {
         return matcher.appendTail(buffer).toString();
     }
 
-    @NotNull
-    public static String colorHexRaw(@NotNull String str) {
+    public static @NotNull String colorHexRaw(@NotNull String str) {
         StringBuilder buffer = new StringBuilder(str);
 
         int index;
@@ -86,35 +79,29 @@ public class StringUtil {
         return buffer.toString();
     }
 
-    @NotNull
-    public static String colorRaw(@NotNull String str) {
+    public static @NotNull String colorRaw(@NotNull String str) {
         return str.replace(ChatColor.COLOR_CHAR, '&');
     }
 
-    @NotNull
-    public static String colorOff(@NotNull String str) {
+    public static @NotNull String colorOff(@NotNull String str) {
         String off = ChatColor.stripColor(str);
         return off == null ? "" : off;
     }
 
-    @NotNull
-    public static List<String> color(@NotNull List<String> list) {
+    public static @NotNull List<String> color(@NotNull List<String> list) {
         list.replaceAll(StringUtil::color);
         return list;
     }
 
-    @NotNull
-    public static Set<String> color(@NotNull Set<String> list) {
+    public static @NotNull Set<String> color(@NotNull Set<String> list) {
         return new HashSet<>(StringUtil.color(new ArrayList<>(list)));
     }
 
-    @NotNull
-    public static List<String> replace(@NotNull List<String> orig, @NotNull String placeholder, boolean keep, String... replacer) {
+    public static @NotNull List<String> replace(@NotNull List<String> orig, @NotNull String placeholder, boolean keep, String... replacer) {
         return StringUtil.replace(orig, placeholder, keep, Arrays.asList(replacer));
     }
 
-    @NotNull
-    public static List<String> replace(@NotNull List<String> orig, @NotNull String placeholder, boolean keep, List<String> replacer) {
+    public static @NotNull List<String> replace(@NotNull List<String> orig, @NotNull String placeholder, boolean keep, List<String> replacer) {
         List<String> replaced = new ArrayList<>();
         for (String line : orig) {
             if (line.contains(placeholder)) {
@@ -167,8 +154,7 @@ public class StringUtil {
         return slots;
     }
 
-    @NotNull
-    public static String capitalizeFully(@NotNull String str) {
+    public static @NotNull String capitalizeFully(@NotNull String str) {
         if (str.length() != 0) {
             str = str.toLowerCase();
             return capitalize(str);
@@ -176,8 +162,7 @@ public class StringUtil {
         return str;
     }
 
-    @NotNull
-    public static String capitalize(@NotNull String str) {
+    public static @NotNull String capitalize(@NotNull String str) {
         if (str.length() != 0) {
             int strLen = str.length();
             StringBuilder buffer = new StringBuilder(strLen);
@@ -202,8 +187,7 @@ public class StringUtil {
         return str;
     }
 
-    @NotNull
-    public static String capitalizeFirstLetter(@NotNull String original) {
+    public static @NotNull String capitalizeFirstLetter(@NotNull String original) {
         if (original.isEmpty()) return original;
         return original.substring(0, 1).toUpperCase() + original.substring(1);
     }
@@ -212,8 +196,7 @@ public class StringUtil {
      * @param original List to remove empty lines from.
      * @return A list with no multiple empty lines in a row.
      */
-    @NotNull
-    public static List<String> stripEmpty(@NotNull List<String> original) {
+    public static @NotNull List<String> stripEmpty(@NotNull List<String> original) {
         List<String> stripped = new ArrayList<>();
         for (int index = 0; index < original.size(); index++) {
             String line = original.get(index);
@@ -226,8 +209,7 @@ public class StringUtil {
         return stripped;
     }
 
-    @NotNull
-    public static List<String> getByFirstLetters(@NotNull String arg, @NotNull List<String> source) {
+    public static @NotNull List<String> getByFirstLetters(@NotNull String arg, @NotNull List<String> source) {
         List<String> ret = new ArrayList<>();
         List<String> sugg = new ArrayList<>(source);
         org.bukkit.util.StringUtil.copyPartialMatches(arg, sugg, ret);
@@ -235,8 +217,7 @@ public class StringUtil {
         return ret;
     }
 
-    @NotNull
-    public static String extractCommandName(@NotNull String cmd) {
+    public static @NotNull String extractCommandName(@NotNull String cmd) {
         String cmdFull = colorOff(cmd).split(" ")[0];
         String cmdName = cmdFull.replace("/", "").replace("\\/", "");
         String[] pluginPrefix = cmdName.split(":");
@@ -262,8 +243,7 @@ public class StringUtil {
         return Boolean.parseBoolean(str);
     }
 
-    @NotNull
-    public static String c(@NotNull String s) {
+    public static @NotNull String c(@NotNull String s) {
         char[] ch = s.toCharArray();
         char[] out = new char[ch.length * 2];
         int i = 0;
@@ -293,8 +273,7 @@ public class StringUtil {
         return String.valueOf(out);
     }
 
-    @NotNull
-    public static String d(@NotNull String s) {
+    public static @NotNull String d(@NotNull String s) {
         char[] ch = s.toCharArray();
         char[] dec = new char[ch.length / 2];
         for (int i = 0; i < ch.length; i = i + 2) {
