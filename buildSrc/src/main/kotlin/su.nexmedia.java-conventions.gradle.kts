@@ -8,7 +8,7 @@ plugins {
 }
 
 repositories {
-    mavenLocal() {
+    mavenLocal {
         content {
             includeGroup("net.leonardo_dgs")
             includeGroup("com.github.DieReicheErethons")
@@ -71,8 +71,6 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
-    withSourcesJar()
-    withJavadocJar()
 }
 
 tasks {

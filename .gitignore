@@ -6,12 +6,24 @@
 # Build stuff
 
 /buildSrc/build
+
 /NexEngine/build
+/NexEngine/target
+
 /NexEngineCompat_V1_17_R1/build
+/NexEngineCompat_V1_17_R1/target
+
 /NexEngineCompat_V1_18_R2/build
+/NexEngineCompat_V1_18_R2/target
+
 /NexEngineCompat_V1_19_R1/build
+/NexEngineCompat_V1_19_R1/target
+
 /NexEngineCompat_V1_19_R2/build
+/NexEngineCompat_V1_19_R2/target
+
 /NMS/build
+/NMS/target
 
 # Output jars
 

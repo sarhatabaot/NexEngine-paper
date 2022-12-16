@@ -12,3 +12,15 @@ dependencies {
 }
 
 description = "NMS"
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+}
