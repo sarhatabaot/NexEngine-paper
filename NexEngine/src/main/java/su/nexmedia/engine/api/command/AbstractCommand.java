@@ -141,6 +141,7 @@ public abstract class AbstractCommand<P extends NexPlugin<P>> implements IPlaceh
         return Collections.emptyList();
     }
 
+    @Deprecated
     protected void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         this.onExecute(sender, label, args, new HashMap<>());
     }
