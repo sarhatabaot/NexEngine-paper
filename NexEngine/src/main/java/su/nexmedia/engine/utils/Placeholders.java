@@ -43,7 +43,7 @@ public class Placeholders {
         public static UnaryOperator<String> replacer(@NotNull org.bukkit.entity.Player player) {
             return str -> str
                 .replace(NAME, player.getName())
-                .replace(DISPLAY_NAME, player.getDisplayName())
+                .replace(DISPLAY_NAME, StringUtil.asMiniMessage(player.displayName()))
                 ;
         }
 

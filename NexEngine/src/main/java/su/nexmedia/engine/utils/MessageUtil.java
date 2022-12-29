@@ -1,18 +1,15 @@
 package su.nexmedia.engine.utils;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.json.text.ClickText;
-import su.nexmedia.engine.utils.json.text.ClickWord;
+import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.utils.regex.RegexUtil;
 
 import java.util.HashMap;
@@ -22,36 +19,50 @@ import java.util.regex.Pattern;
 
 public class MessageUtil {
 
-    @Deprecated private static final Pattern  PATTERN_LEGACY_JSON_FULL = Pattern.compile("((\\{json:)+(.*?)(\\})+(.*?))(\\{end-json\\})");
-    private static final Map<String, Pattern> PATTERN_JSON_PARAMS      = new HashMap<>();
-    //private static final Pattern              PATTERN_JSON_FULL   = Pattern.compile("((\\{json:)+(.+?)\\}+(.*?))");
-    //private static final Pattern              PATTERN_JSON_FULL   = Pattern.compile("((\\{json:){1}(.*?)\\}{1})");
-    private static final Pattern PATTERN_JSON_FULL = Pattern.compile("(\\{json:(.*?)\\}+)");
+    @Deprecated private static final Pattern              PATTERN_LEGACY_JSON_FULL = Pattern.compile("((\\{json:)+(.*?)(\\})+(.*?))(\\{end-json\\})");
+    @Deprecated private static final Map<String, Pattern> PATTERN_JSON_PARAMS      = new HashMap<>();
+    private static final             Pattern              PATTERN_JSON_FULL        = Pattern.compile("(\\{json:(.*?)\\}+)");
 
-    static {
-        for (String parameter : new String[]{"text", "hint", "hover", "showText", "chat-type", "runCommand", "chat-suggest", "suggestCommand", "url", "openUrl", "showItem", "copyToClipboard"}) {
-            PATTERN_JSON_PARAMS.put(parameter, Pattern.compile("~+(" + parameter + ")+?:+(.*?);"));
+    public static void playSound(@NotNull Audience audience, @Nullable Sound.Type soundType) {
+        if (soundType != null) {
+            audience.playSound(Sound.sound(soundType, Sound.Source.MASTER, .9f, .9f));
         }
     }
 
-    public static void sendActionBar(@NotNull Player player, @NotNull String msg) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
-    }
-
-    public static void sound(@NotNull Player player, @Nullable Sound sound) {
-        if (sound == null) return;
-        player.playSound(player.getLocation(), sound, 0.9f, 0.9f);
-    }
-
-    public static void sound(@NotNull Location location, @Nullable Sound sound) {
+    public static void playSound(@NotNull Location location, @Nullable Sound.Type soundType) {
         World world = location.getWorld();
-        if (world == null || sound == null) return;
-
-        world.playSound(location, sound, 0.9f, 0.9f);
+        if (world != null && soundType != null) {
+            world.playSound(Sound.sound(soundType, Sound.Source.MASTER, .9f, .9f));
+        }
     }
 
-    @NotNull
-    public static String toNewFormat(@NotNull String message) {
+    public static void sendActionBar(@NotNull Audience audience, @NotNull String message) {
+        audience.sendActionBar(StringUtil.asComponent(message));
+    }
+
+    public static void sendMessage(@NotNull Audience audience, String message) {
+        audience.sendMessage(StringUtil.asComponent(message));
+    }
+
+    public static void showTitle(@NotNull Audience audience, @NotNull String title, @NotNull String subTitle, int fadeIn, int stay, int fadeOut) {
+        audience.showTitle(Title.title(
+            StringUtil.asComponent(title),
+            StringUtil.asComponent(subTitle),
+            Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(stay), Ticks.duration(fadeOut))
+        ));
+    }
+
+    public static void showTitle(@NotNull Audience audience, @NotNull String title, @NotNull String subTitle) {
+        audience.showTitle(Title.title(
+            StringUtil.asComponent(title),
+            StringUtil.asComponent(subTitle)
+        ));
+    }
+
+    /* Methods below are all deprecated json wrappers */
+
+    @Deprecated
+    public static @NotNull String toNewFormat(@NotNull String message) {
         Matcher matcherOld = RegexUtil.getMatcher(PATTERN_LEGACY_JSON_FULL, message);
         int index = 0;
         while (RegexUtil.matcherFind(matcherOld)) {
@@ -70,28 +81,19 @@ public class MessageUtil {
         return matcher.find();
     }
 
+    @Deprecated
     public static boolean hasJson(@NotNull String str) {
         Matcher matcher = RegexUtil.getMatcher(PATTERN_JSON_FULL, str);
         return matcher.find() || isJSON(str);
     }
 
-    @NotNull
     @Deprecated
-    public static String stripJsonOld(@NotNull String message) {
-        /*Matcher matcher = RegexUtil.getMatcher(PATTERN_LEGACY_JSON_FULL, message);
-        if (matcher == null) return message;
-
-        while (matcher.find()) {
-            String jsonRaw = matcher.group(0); // Full json text, like '{json: <args>}Text{end-json}
-            String jsonText = matcher.group(5); // The text to apply JSON on.
-
-            message = message.replace(jsonRaw, jsonText);
-        }*/
+    public static @NotNull String stripJsonOld(@NotNull String message) {
         return stripJson(toNewFormat(message));
     }
 
-    @NotNull
-    public static String stripJson(@NotNull String message) {
+    @Deprecated
+    public static @NotNull String stripJson(@NotNull String message) {
         Matcher matcher = RegexUtil.getMatcher(PATTERN_JSON_FULL, message);
         while (RegexUtil.matcherFind(matcher)) {
             String jsonRaw = matcher.group(0); // Full json text
@@ -100,8 +102,8 @@ public class MessageUtil {
         return message;
     }
 
-    @NotNull
-    public static String toSimpleText(@NotNull String message) {
+    @Deprecated
+    public static @NotNull String toSimpleText(@NotNull String message) {
         message = toNewFormat(message);
 
         Matcher matcher = RegexUtil.getMatcher(PATTERN_JSON_FULL, message);
@@ -119,66 +121,20 @@ public class MessageUtil {
         sendWithJson(sender, message);
     }
 
-    public static String[] extractNonJson(@NotNull String message) {
+    @Deprecated
+    public static @NotNull String[] extractNonJson(@NotNull String message) {
         message = StringUtil.color(message.replace("\n", " "));
         message = toNewFormat(message);
         return PATTERN_JSON_FULL.split(message);
     }
 
+    @Deprecated
     public static void sendWithJson(@NotNull CommandSender sender, @NotNull String message) {
-        message = StringUtil.color(message.replace("\n", " "));
-        message = toNewFormat(message);
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(toSimpleText(message));
-            return;
-        }
-
-        Matcher matcher = RegexUtil.getMatcher(PATTERN_JSON_FULL, message);
-        Map<String, String> textParams = new HashMap<>();
-        int index = 0;
-        while (RegexUtil.matcherFind(matcher)) {
-            String jsonRaw = matcher.group(0); // Full json text, like '{json: <args>}
-            String jsonArgs = matcher.group(2).trim(); // Only json parameters, like '~hover: Text; ~openUrl: google.com;'
-            //String jsonText = matcher.group(5); // The text to apply JSON on.
-
-            String placeholder = "{%" + (index++) + "%}";
-            message = message.replace(jsonRaw, placeholder);
-            textParams.put(placeholder, jsonArgs);
-        }
-
-        ClickText clickText = new ClickText(message);
-        for (Map.Entry<String, String> entry : textParams.entrySet()) {
-            String placeholder = entry.getKey();
-            String params = entry.getValue();
-
-            String text = getParamValue(params, "text");
-            if (text == null) text = "";
-
-            ClickWord clickWord = clickText.addComponent(placeholder, text);
-            for (Map.Entry<String, Pattern> entryParams : PATTERN_JSON_PARAMS.entrySet()) {
-                String param = entryParams.getKey();
-                String paramValue = getParamValue(params, param);
-                if (paramValue == null) continue;
-
-                switch (param) {
-                    case "hint", "hover", "showText" -> clickWord.showText(paramValue.split("\\|"));
-                    case "chat-type", "runCommand" -> clickWord.runCommand(paramValue);
-                    case "chat-suggest", "suggestCommand" -> clickWord.suggestCommand(paramValue);
-                    case "url", "openUrl" -> clickWord.openURL(StringUtil.colorOff(paramValue));
-                    case "copyToClipboard" -> clickWord.copyToClipboard(paramValue);
-                    case "showItem" -> {
-                        ItemStack item = ItemUtil.fromBase64(paramValue);
-                        clickWord.showItem(item == null ? new ItemStack(Material.AIR) : item);
-                    }
-                }
-            }
-        }
-
-        clickText.send(sender);
+        NexEngine.get().warn("sendWithJson is deprecated! Please migrate the code.");
     }
 
-    @Nullable
-    private static String getParamValue(@NotNull String from, @NotNull String param) {
+    @Deprecated
+    private static @Nullable String getParamValue(@NotNull String from, @NotNull String param) {
         Pattern pattern = PATTERN_JSON_PARAMS.get(param);
         if (pattern == null) return null;
 

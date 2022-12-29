@@ -6,7 +6,7 @@ import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.lang.EngineLang;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.MessageUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,13 +36,14 @@ public class AboutSubCommand<P extends NexPlugin<P>> extends AbstractCommand<P> 
 
     @Override
     public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        List<String> info = StringUtil.color(Arrays.asList(
-            "&7",
-            "&e" + plugin.getName() + " &6v" + plugin.getDescription().getVersion() + " &ecreated by &6" + plugin.getAuthor(),
-            "&eType &6/" + plugin.getLabel() + " help&e to list plugin commands.",
-            "&7",
-            "&2Powered by &a&l" + NexEngine.get().getName() + "&2, © 2019-2022 &a" + NexPlugin.TM));
+        List<String> info = Arrays.asList(
+            "",
+            "<yellow>" + plugin.getName() + " <gold>v" + plugin.getDescription().getVersion() + "</gold> created by <gold>" + plugin.getAuthor(),
+            "<yellow>Type <gold>/" + plugin.getLabel() + " help</gold> to list plugin commands.",
+            "",
+            "<dark_green>Powered by <green><b>" + NexEngine.get().getName() + "</b></green>, © 2019-2022 <green>" + NexPlugin.TM
+        );
 
-        info.forEach(sender::sendMessage);
+        info.forEach(text -> MessageUtil.sendMessage(sender, text));
     }
 }

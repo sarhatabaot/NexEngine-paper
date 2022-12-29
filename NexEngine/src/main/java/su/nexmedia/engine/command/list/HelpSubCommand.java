@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.lang.EngineLang;
+import su.nexmedia.engine.utils.MessageUtil;
 
 public class HelpSubCommand<P extends NexPlugin<P>> extends AbstractCommand<P> {
 
@@ -41,11 +42,11 @@ public class HelpSubCommand<P extends NexPlugin<P>> extends AbstractCommand<P> {
                 for (AbstractCommand<P> cmd : this.parent.getChildrens()) {
                     if (!cmd.hasPermission(sender)) continue;
 
-                    sender.sendMessage(cmd.replacePlaceholders().apply(line));
+                    MessageUtil.sendMessage(sender, cmd.replacePlaceholders().apply(line));
                 }
                 continue;
             }
-            sender.sendMessage(line);
+            MessageUtil.sendMessage(sender, line);
         }
     }
 }

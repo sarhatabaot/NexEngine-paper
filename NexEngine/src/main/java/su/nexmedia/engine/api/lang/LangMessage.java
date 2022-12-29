@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 public class LangMessage {
 
-    private static final Pattern              PATTERN_MESSAGE_FULL   = Pattern.compile("((\\{message:)+(.+?)\\}+(.*?))");
+    private static final Pattern              PATTERN_MESSAGE_FULL   = Pattern.compile("(\\{message:)+(.+?)}+(.*)");
     private static final Map<String, Pattern> PATTERN_MESSAGE_PARAMS = new HashMap<>();
 
     static {
@@ -32,18 +32,31 @@ public class LangMessage {
 
     private final NexPlugin<?> plugin;
 
+    /* All the text data are stored as MiniMessage format */
     private String msgRaw;
     private String msgLocalized;
-    private OutputType type = OutputType.CHAT;
-    private boolean hasPrefix = true;
-    private Sound sound;
-    private int[] titleTimes = new int[3];
 
+    private OutputType type       = OutputType.CHAT;
+    private boolean    hasPrefix  = true;
+    private Sound      sound;
+    private int[]      titleTimes = new int[3];
+
+    /**
+     * Constructs a new instance with default settings.
+     *
+     * @param plugin the plugin
+     * @param raw the raw text
+     */
     public LangMessage(@NotNull NexPlugin<?> plugin, @NotNull String raw) {
         this.plugin = plugin;
         this.setRaw(raw);
     }
 
+    /**
+     * Constructs a copy of this instance.
+     *
+     * @param from an instance
+     */
     LangMessage(@NotNull LangMessage from) {
         this.plugin = from.plugin;
         this.msgRaw = from.getRaw();
@@ -58,10 +71,9 @@ public class LangMessage {
         Matcher matcher = RegexUtil.getMatcher(PATTERN_MESSAGE_FULL, msg);
         if (!RegexUtil.matcherFind(matcher)) return;
 
-        // String with only args
-        String msgRaw = matcher.group(0);
-        String msgParams = matcher.group(3).trim();
-        this.msgLocalized = msg.replace(msgRaw, "");
+        String msgRaw = matcher.group(3); // Extract all the text after `{params}`
+        String msgParams = matcher.group(2).trim(); // Extract all the `params`
+        this.msgLocalized = msgRaw;
 
         for (Map.Entry<String, Pattern> entryParams : PATTERN_MESSAGE_PARAMS.entrySet()) {
             Matcher matcherParam = RegexUtil.getMatcher(entryParams.getValue(), msgParams);
@@ -83,8 +95,7 @@ public class LangMessage {
         }
     }
 
-    @NotNull
-    public String getRaw() {
+    public @NotNull String getRaw() {
         return this.msgRaw;
     }
 
@@ -94,31 +105,27 @@ public class LangMessage {
         this.setArguments(this.getLocalized());
     }
 
-    @NotNull
-    public String getLocalized() {
+    public @NotNull String getLocalized() {
         return this.msgLocalized;
     }
 
     private void setLocalized(@NotNull String msgLocalized) {
-        this.msgLocalized = StringUtil.color(msgLocalized);
+        this.msgLocalized = msgLocalized;
     }
 
     @SuppressWarnings("unchecked")
-    @NotNull
-    public LangMessage replace(@NotNull String var, @NotNull Object replacer) {
+    public @NotNull LangMessage replace(@NotNull String var, @NotNull Object replacer) {
         if (this.isEmpty()) return this;
         if (replacer instanceof List) return this.replace(var, (List<Object>) replacer);
         return this.replace(str -> str.replace(var, String.valueOf(replacer)));
     }
 
-    @NotNull
-    public LangMessage replace(@NotNull String var, @NotNull List<Object> replacer) {
+    public @NotNull LangMessage replace(@NotNull String var, @NotNull List<Object> replacer) {
         if (this.isEmpty()) return this;
         return this.replace(str -> str.replace(var, String.join("\\n", replacer.stream().map(Object::toString).toList())));
     }
 
-    @NotNull
-    public LangMessage replace(@NotNull UnaryOperator<String> replacer) {
+    public @NotNull LangMessage replace(@NotNull UnaryOperator<String> replacer) {
         if (this.isEmpty()) return this;
 
         LangMessage msgCopy = new LangMessage(this);
@@ -127,7 +134,7 @@ public class LangMessage {
     }
 
     public boolean isEmpty() {
-        return (this.type == LangMessage.OutputType.NONE || this.getLocalized().isEmpty());
+        return this.type == OutputType.NONE || this.getLocalized().isEmpty();
     }
 
     public void broadcast() {
@@ -141,12 +148,12 @@ public class LangMessage {
         if (this.isEmpty()) return;
 
         if (this.sound != null && sender instanceof Player player) {
-            MessageUtil.sound(player, this.sound);
+            MessageUtil.playSound(player, this.sound);
         }
 
         if (this.type == LangMessage.OutputType.CHAT) {
             String prefix = hasPrefix ? plugin.getConfigManager().pluginPrefix : "";
-            this.asList().forEach(line -> MessageUtil.sendWithJson(sender, prefix + line));
+            this.asList().forEach(line -> MessageUtil.sendMessage(sender, prefix + line));
             return;
         }
 
@@ -158,35 +165,28 @@ public class LangMessage {
                 List<String> list = this.asList();
                 String title = list.size() > 0 ? list.get(0) : "";
                 String subtitle = list.size() > 1 ? list.get(1) : "";
-                player.sendTitle(title, subtitle, this.titleTimes[0], this.titleTimes[1], this.titleTimes[2]);
+                MessageUtil.showTitle(player, title, subtitle, this.titleTimes[0], this.titleTimes[1], this.titleTimes[2]);
             }
         }
     }
 
-    @NotNull
-    public List<String> asList() {
-        return this.isEmpty() ? Collections.emptyList() : Stream.of(this.getLocalized().split("\\\\n"))
-            .filter(Predicate.not(String::isEmpty)).toList();
+    public @NotNull List<String> asList() {
+        if (this.isEmpty()) return Collections.emptyList();
+        return Stream.of(this.getLocalized().split("\\\\n"))
+                     .filter(Predicate.not(String::isEmpty)).toList();
     }
 
     /**
      * Replaces a raw '\n' new line splitter with a system one.
+     *
      * @return A string with a system new line splitters.
      */
-    @NotNull
-    public String normalizeLines() {
+    public @NotNull String normalizeLines() {
         return String.join("\n", this.asList());
     }
 
-    @NotNull
-    private UnaryOperator<String> replaceDefaults() {
-        return str -> {
-            /*for (Map.Entry<String, String> entry : this.template.getCustomPlaceholders().entrySet()) {
-                if (entry.getKey().isEmpty() || entry.getValue().isEmpty()) continue;
-                str = str.replace(entry.getKey(), entry.getValue());
-            }*/
-            return Placeholders.Plugin.replacer(plugin).apply(str);
-        };
+    private @NotNull UnaryOperator<String> replaceDefaults() {
+        return str -> Placeholders.Plugin.replacer(plugin).apply(str);
     }
 
     public enum OutputType {

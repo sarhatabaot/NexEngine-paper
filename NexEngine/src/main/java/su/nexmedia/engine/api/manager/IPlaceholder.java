@@ -1,13 +1,15 @@
 package su.nexmedia.engine.api.manager;
 
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 public interface IPlaceholder {
 
-    String DELIMITER_DEFAULT = "\n" + ChatColor.GREEN;
+    String  DELIMITER_DEFAULT = "\n";
+    Pattern PERCENT_PATTERN   = Pattern.compile("%([^%]+)%");
+    Pattern BRACKET_PATTERN   = Pattern.compile("[{]([^{}]+)[}]");
 
     @NotNull UnaryOperator<String> replacePlaceholders();
 }

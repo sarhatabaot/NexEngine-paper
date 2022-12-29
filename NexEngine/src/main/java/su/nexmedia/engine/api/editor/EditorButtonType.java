@@ -1,11 +1,13 @@
 package su.nexmedia.engine.api.editor;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,84 +16,82 @@ import java.util.stream.Stream;
 
 public interface EditorButtonType {
 
-    String PREFIX_INFO = "&6&l[?] Description:";
-    String PREFIX_NOTE = "&e&l[!] Note:";
-    String PREFIX_WARN = "&c&l[!] Warning:";
-    String PREFIX_CLICK = "#55e136&l[>] Actions:";
-    String PREFIX_CURRENT = "&b&l[?] Current:";
-    String COLOR_GRAY = "&7";
-    String COLOR_RED = "#C70039";
-    String COLOR_GREEN = "#86de2a";
-    String COLOR_YELLOW = "#FFC300";
-
-    @NotNull String name();
+    String PREFIX_INFO = "<gold><b>[?] Description:";
+    String PREFIX_NOTE = "<yellow><b>[!] Note:";
+    String PREFIX_WARN = "<red><b>[!] Warning:";
+    String PREFIX_CLICK = "<#55e13><b>[>] Actions:";
+    String PREFIX_CURRENT = "<aqua><b>[?] Current:";
 
     @NotNull Material getMaterial();
 
-    void setName(@NotNull String name);
+    @NotNull String name();
 
-    @NotNull String getName();
+    void setName(@NotNull Component name);
 
-    void setLore(@NotNull List<String> lore);
+    @NotNull Component getName();
 
-    @NotNull List<String> getLore();
+    void setLore(@NotNull List<Component> lore);
 
-    @NotNull
-    static String current(@NotNull String text) {
-        return formatted(text, PREFIX_CURRENT, "&a");
+    @NotNull List<Component> getLore();
+
+    static @NotNull String current(@NotNull String miniMessage) {
+        return formatted(miniMessage, PREFIX_CURRENT, "<green>");
     }
 
-    @NotNull
-    static String info(@NotNull String text) {
-        return formatted(split(text), PREFIX_INFO, COLOR_GRAY);
+    static @NotNull String info(@NotNull String miniMessage) {
+        return formatted(split(miniMessage), PREFIX_INFO, "<gray>");
     }
 
-    @NotNull
-    static String warn(@NotNull String text) {
-        return formatted(split(text), PREFIX_WARN, COLOR_RED);
+    static @NotNull String warn(@NotNull String miniMessage) {
+        return formatted(split(miniMessage), PREFIX_WARN, "<#c70039>"); // kinda red
     }
 
-    @NotNull
-    static String note(@NotNull String text) {
-        return formatted(split(text), PREFIX_NOTE, COLOR_YELLOW);
+    static @NotNull String note(@NotNull String miniMessage) {
+        return formatted(split(miniMessage), PREFIX_NOTE, "<#ffc300>"); // kinda yellow
     }
 
-    @NotNull
-    static String click(@NotNull String text) {
-        return formatted(text, PREFIX_CLICK, COLOR_GREEN);
+    static @NotNull String click(@NotNull String miniMessage) {
+        return formatted(miniMessage, PREFIX_CLICK, "<#86de2a>"); // kinda green
     }
 
-    @NotNull
-    static String formatted(@NotNull String text, @NotNull String prefix, @NotNull String color) {
+    static @NotNull String formatted(@NotNull String text, @NotNull String prefix, @NotNull String color) {
         List<String> list = new ArrayList<>(Arrays.asList(text.split("\n")));
         list.replaceAll(line -> color + line);
         list.add(0, prefix);
         return String.join("\n", list);
     }
 
-    @NotNull
-    static List<String> fineLore(@NotNull String... lores) {
-        List<String> lore = new ArrayList<>();
-        Stream.of(lores).map(str -> str.split("\n")).forEach(arr -> {
-            if (!lore.isEmpty()) lore.add(" ");
-            lore.addAll(Arrays.asList(arr));
+    static @NotNull List<String> fineLore(@NotNull String... lore) {
+        List<String> newLore = new ArrayList<>();
+        Stream.of(lore).map(str -> str.split("\n")).forEach(arr -> {
+            if (!newLore.isEmpty()) newLore.add(" ");
+            newLore.addAll(Arrays.asList(arr));
         });
-        return lore;
+        return newLore;
     }
 
-    @NotNull
-    static String split(@NotNull String str) {
-        return str.replaceAll("((?:[^\\s]*\\s){5}[^\\s]*)\\s", "$1\n");
+    /**
+     * Transforms the text into multiple segments which are separated with {@code <br>} tag so that it can fit in
+     * an item lore description and avoid the text reaching out of screen.
+     *
+     * @param miniMessage a string in MiniMessage format
+     *
+     * @return the original miniMessage but the content is separated with {@code <br>} tag
+     */
+    static @NotNull String split(@NotNull String miniMessage) {
+        return miniMessage.replaceAll("((?:\\S*\\s){5}\\S*)\\s", "$1\n");
     }
 
-    @NotNull
-    default ItemStack getItem() {
+    default @NotNull ItemStack getItem() {
         ItemStack item = new ItemStack(this.getMaterial());
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        meta.setDisplayName(StringUtil.color("&e&l") + this.getName());
-        meta.setLore(this.getLore());
+        meta.displayName(this.getName()
+                             .color(NamedTextColor.YELLOW)
+                             .decorate(TextDecoration.BOLD)
+        );
+        meta.lore(this.getLore());
         meta.addItemFlags(ItemFlag.values());
         item.setItemMeta(meta);
 

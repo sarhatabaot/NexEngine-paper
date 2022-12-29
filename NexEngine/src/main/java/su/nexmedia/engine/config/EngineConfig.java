@@ -3,7 +3,6 @@ package su.nexmedia.engine.config;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.utils.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,7 @@ public class EngineConfig {
 
         LOCALE_WORLD_NAMES = new HashMap<>();
         cfg.getSection("Locale.World_Names").forEach(world -> {
-            String name = StringUtil.color(cfg.getString("Locale.World_Names." + world, world));
+            String name = cfg.getString("Locale.World_Names." + world, world);
             LOCALE_WORLD_NAMES.put(world, name);
         });
 

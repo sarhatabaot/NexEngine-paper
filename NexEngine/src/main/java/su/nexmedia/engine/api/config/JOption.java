@@ -1,5 +1,6 @@
 package su.nexmedia.engine.api.config;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,14 +12,16 @@ import java.util.function.Supplier;
 
 public class JOption<T> {
 
-    public static final Reader<Boolean>      READER_BOOLEAN     = JYML::getBoolean;
-    public static final Reader<Integer>      READER_INT         = JYML::getInt;
-    public static final Reader<Double>       READER_DOUBLE      = JYML::getDouble;
-    public static final Reader<Long>         READER_LONG        = JYML::getLong;
-    public static final Reader<String>       READER_STRING      = (cfg, path, def) -> StringUtil.color(cfg.getString(path, def));
-    public static final Reader<Set<String>>  READER_SET_STRING  = (cfg, path, def) -> StringUtil.color(cfg.getStringSet(path));
-    public static final Reader<List<String>> READER_LIST_STRING = (cfg, path, def) -> StringUtil.color(cfg.getStringList(path));
-    public static final Reader<ItemStack>    READER_ITEM        = JYML::getItem;
+    public static final Reader<Boolean>         READER_BOOLEAN        = JYML::getBoolean;
+    public static final Reader<Integer>         READER_INT            = JYML::getInt;
+    public static final Reader<Double>          READER_DOUBLE         = JYML::getDouble;
+    public static final Reader<Long>            READER_LONG           = JYML::getLong;
+    public static final Reader<String>          READER_STRING         = JYML::getString;
+    public static final Reader<Set<String>>     READER_SET_STRING     = (cfg, path, def) -> cfg.getStringSet(path);
+    public static final Reader<List<String>>    READER_LIST_STRING    = (cfg, path, def) -> cfg.getStringList(path);
+    public static final Reader<Component>       READER_COMPONENT      = (cfg, path, def) -> cfg.getComponent(path);
+    public static final Reader<List<Component>> READER_LIST_COMPONENT = (cfg, path, def) -> cfg.getComponentList(path);
+    public static final Reader<ItemStack>       READER_ITEM           = JYML::getItem;
 
     protected final Reader<T> reader;
     protected final String    path;
@@ -71,6 +74,16 @@ public class JOption<T> {
     @NotNull
     public static JOption<Set<String>> create(@NotNull String path, @NotNull Set<String> defaultValue, @NotNull String... description) {
         return new JOption<>(path, READER_SET_STRING, defaultValue, description);
+    }
+
+    @NotNull
+    public static JOption<Component> of(@NotNull String path, @NotNull String defaultValue, @NotNull String... description) {
+        return new JOption<>(path, READER_COMPONENT, StringUtil.asComponent(defaultValue), description);
+    }
+
+    @NotNull
+    public static JOption<List<Component>> of(@NotNull String path, @NotNull List<String> defaultValue, @NotNull String... description) {
+        return new JOption<>(path, READER_LIST_COMPONENT, StringUtil.asComponent(defaultValue), description);
     }
 
     @NotNull

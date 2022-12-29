@@ -4,13 +4,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class EditorObject<T,E extends Enum<E>> {
+public class EditorObject<T, E extends Enum<E>> {
 
-    private final E      type;
-    private final T                object;
-    private final EditorInput<T,E> input;
+    private final E                 type;
+    private final T                 object;
+    private final EditorInput<T, E> input;
 
-    public EditorObject(@NotNull T object, @NotNull E type, @NotNull EditorInput<T,E> input) {
+    public EditorObject(@NotNull T object, @NotNull E type, @NotNull EditorInput<T, E> input) {
         this.type = type;
         this.object = object;
         this.input = input;
@@ -27,7 +27,7 @@ public class EditorObject<T,E extends Enum<E>> {
     }
 
     @NotNull
-    public EditorInput<T,E> getInput() {
+    public EditorInput<T, E> getInput() {
         return input;
     }
 

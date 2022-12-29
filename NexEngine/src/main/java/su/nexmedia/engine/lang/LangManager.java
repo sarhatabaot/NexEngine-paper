@@ -87,8 +87,7 @@ public class LangManager<P extends NexPlugin<P>> extends AbstractManager<P> {
 
     @Nullable
     public String getMessage(@NotNull String path) {
-        String str = this.getConfig().getString(path);
-        return str == null ? null : StringUtil.color(str);
+        return this.getConfig().getString(path);
     }
 
     @NotNull
@@ -176,8 +175,8 @@ public class LangManager<P extends NexPlugin<P>> extends AbstractManager<P> {
             this.getConfig().addMissing(path + "Name", buttonType.getName());
             this.getConfig().addMissing(path + "Lore", buttonType.getLore());
 
-            buttonType.setName(this.getConfig().getString(path + "Name", nameRaw));
-            buttonType.setLore(this.getConfig().getStringList(path + "Lore"));
+            buttonType.setName(this.getConfig().getComponent(path + "Name", StringUtil.asComponent(nameRaw)));
+            buttonType.setLore(this.getConfig().getComponentList(path + "Lore"));
         }
     }
 

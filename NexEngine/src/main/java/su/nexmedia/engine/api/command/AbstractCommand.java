@@ -169,8 +169,8 @@ public abstract class AbstractCommand<P extends NexPlugin<P>> implements IPlaceh
                 Pattern pattern = entry.getValue();
 
                 Matcher matcher = RegexUtil.getMatcher(pattern, argLine);
-                if (matcher != null && matcher.find()) {
-                    flags.put(flag, StringUtil.color(matcher.group(3)));
+                if (matcher.find()) {
+                    flags.put(flag, matcher.group(3));
                     argLine = StringUtil.oneSpace(argLine.replace(matcher.group(0), ""));
                 }
             }

@@ -29,7 +29,7 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
     @Override
     protected void onLoad() {
         this.getConfig().addMissing("Plugin.Name", plugin.getName());
-        this.getConfig().addMissing("Plugin.Prefix", "&e" + Placeholders.Plugin.NAME + " &8» &7");
+        this.getConfig().addMissing("Plugin.Prefix", "<yellow>" + Placeholders.Plugin.NAME + " <dark_gray>» <gray>");
         this.getConfig().addMissing("Plugin.Command_Aliases", plugin.getName().toLowerCase());
         this.getConfig().addMissing("Plugin.Language", "en");
         this.getConfig().addMissing("Plugin.MiniMessage", false);
@@ -40,9 +40,8 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
         this.getConfig().setComments("Plugin.Language", "Sets the plugin language.", "It will use language config from the /lang/ folder for specified language code.", "By default it's 'en', so 'messages_en.yml' will be used.");
         this.getConfig().setComments("Plugin.MiniMessage", "Set true to use MiniMessage for message configs.", "This will disable the legacy formatting in most configs.");
 
-        this.pluginName = StringUtil.color(getConfig().getString("Plugin.Name", plugin.getName()));
-        this.pluginPrefix = StringUtil.color(this.getConfig().getString("Plugin.Prefix", "&e" + Placeholders.Plugin.NAME + " &8» &7")
-            .replace(Placeholders.Plugin.NAME, this.pluginName));
+        this.pluginName = getConfig().getString("Plugin.Name", plugin.getName());
+        this.pluginPrefix = this.getConfig().getString("Plugin.Prefix", "<yellow>" + Placeholders.Plugin.NAME + " <dark_gray>» <gray>").replace(Placeholders.Plugin.NAME, this.pluginName);
         this.commandAliases = getConfig().getString("Plugin.Command_Aliases", "").split(",");
         this.languageCode = getConfig().getString("Plugin.Language", "en").toLowerCase();
         this.miniMessage = getConfig().getBoolean("Plugin.MiniMessage");

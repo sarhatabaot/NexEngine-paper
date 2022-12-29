@@ -1,5 +1,6 @@
 package su.nexmedia.engine.api.menu;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,16 +19,16 @@ import java.util.*;
 
 public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListener<P> implements IMenu {
 
-    protected final UUID   id;
+    protected final UUID                         id;
     protected final Map<Player, int[]>           userPage;
-    protected final Set<Player>       viewers;
-    private final   Map<Player, Long> fastClick;
-    protected       String title;
-    protected       int    size;
-    protected       JYML   cfg;
+    protected final Set<Player>                  viewers;
+    private final   Map<Player, Long>            fastClick;
+    protected       Component                    title;
+    protected       int                          size;
+    protected       JYML                         cfg;
     protected       Map<String, IMenuItem>       items;
     protected       Map<Player, List<IMenuItem>> userItems;
-    
+
     @Deprecated protected long                 animationInterval;
     @Deprecated private   MenuAnimationTask<P> animationTask;
 
@@ -39,10 +40,29 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
         this.setupAnimationTask();
     }
 
+    /**
+     * @deprecated in favor of {@link AbstractMenu#AbstractMenu(NexPlugin, Component, int)}
+     */
+    @Deprecated
     public AbstractMenu(@NotNull P plugin, @NotNull String title, int size) {
         super(plugin);
         this.id = UUID.randomUUID();
-        this.setTitle(title);
+        this.title = StringUtil.asComponent(title);
+        this.setSize(size);
+
+        this.items = new LinkedHashMap<>();
+        this.userItems = new WeakHashMap<>();
+        this.userPage = new WeakHashMap<>();
+        this.viewers = new HashSet<>();
+        this.fastClick = new HashMap<>();
+
+        this.registerListeners();
+    }
+
+    public AbstractMenu(@NotNull P plugin, @NotNull Component title, int size) {
+        super(plugin);
+        this.id = UUID.randomUUID();
+        this.title = title;
         this.setSize(size);
 
         this.items = new LinkedHashMap<>();
@@ -93,7 +113,8 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
             case CLOSE -> player.closeInventory();
             case PAGE_NEXT -> this.open(player, Math.min(pageMax, this.getPage(player) + 1));
             case PAGE_PREVIOUS -> this.open(player, Math.max(1, this.getPage(player) - 1));
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -115,13 +136,13 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
 
     @NotNull
     @Override
-    public String getTitle() {
-        return title;
+    public Component getTitle() {
+        return this.title;
     }
 
     @Override
-    public void setTitle(@NotNull String title) {
-        this.title = StringUtil.color(title);
+    public void setTitle(@NotNull Component title) {
+        this.title = title;
     }
 
     @Override
@@ -140,21 +161,18 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
         return items;
     }
 
-    @NotNull
     @Override
-    public Map<Player, List<IMenuItem>> getUserItemsMap() {
+    public @NotNull Map<Player, List<IMenuItem>> getUserItemsMap() {
         return userItems;
     }
 
-    @NotNull
     @Override
-    public Map<Player, int[]> getUserPageMap() {
+    public @NotNull Map<Player, int[]> getUserPageMap() {
         return userPage;
     }
 
-    @NotNull
     @Override
-    public Set<Player> getViewers() {
+    public @NotNull Set<Player> getViewers() {
         return viewers;
     }
 
@@ -182,7 +200,8 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
         boolean isPlayerSlot = slot >= inventory.getSize();
         boolean isEmptyItem = item == null || item.getType().isAir();
 
-        SlotType slotType = isPlayerSlot ? (isEmptyItem ? SlotType.EMPTY_PLAYER : SlotType.PLAYER) : (isEmptyItem ? SlotType.EMPTY_MENU : SlotType.MENU);
+        SlotType slotType = isPlayerSlot ? (isEmptyItem ? SlotType.EMPTY_PLAYER : SlotType.PLAYER)
+                                         : (isEmptyItem ? SlotType.EMPTY_MENU : SlotType.MENU);
         if (this.cancelClick(e, slotType)) {
             e.setCancelled(true);
         }

@@ -1,63 +1,67 @@
 package su.nexmedia.engine.api.menu;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.editor.EditorButtonType;
 import su.nexmedia.engine.utils.StringUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public enum MenuItemType implements EditorButtonType {
     NONE,
-    PAGE_NEXT(Material.ARROW, "&6&lNext Page"),
-    PAGE_PREVIOUS(Material.ARROW, "&6&lPrevious Page"),
-    CLOSE(Material.BARRIER, "&c&lClose"),
-    RETURN(Material.BARRIER, "&c&lReturn"),
-    CONFIRMATION_ACCEPT(Material.LIME_DYE, "&a&lAccept"),
-    CONFIRMATION_DECLINE(Material.PINK_DYE, "&c&lDecline"),
+    PAGE_NEXT(Material.ARROW, "<gold><b>Next Page"),
+    PAGE_PREVIOUS(Material.ARROW, "<gold><b>Previous Page"),
+    CLOSE(Material.BARRIER, "<red><b>Close"),
+    RETURN(Material.BARRIER, "<red><b>Return"),
+    CONFIRMATION_ACCEPT(Material.LIME_DYE, "<green><b>Accept"),
+    CONFIRMATION_DECLINE(Material.PINK_DYE, "<red><b>Decline"),
     ;
 
-    private final Material material;
-    private       String   name;
-    private List<String> lore;
+    private final Material        material;
+    private       Component       name;
+    private       List<Component> lore;
 
     MenuItemType() {
-        this(Material.AIR, "", "");
+        this(Material.AIR, Component.empty(), Component.empty());
     }
 
     MenuItemType(@NotNull Material material, @NotNull String name, @NotNull String... lore) {
+        this.material = material;
+        this.setName(StringUtil.asComponent(name));
+        this.setLore(StringUtil.asComponent(Arrays.asList(lore)));
+    }
+
+    MenuItemType(@NotNull Material material, @NotNull Component name, @NotNull Component... lore) {
         this.material = material;
         this.setName(name);
         this.setLore(Arrays.asList(lore));
     }
 
-    @NotNull
     @Override
-    public Material getMaterial() {
-        return material;
+    public @NotNull Material getMaterial() {
+        return this.material;
     }
 
     @Override
-    @NotNull
-    public String getName() {
-        return name;
+    public @NotNull Component getName() {
+        return this.name;
     }
 
     @Override
-    public void setName(@NotNull String name) {
-        this.name = StringUtil.color(name);
+    public void setName(@NotNull Component name) {
+        this.name = name;
     }
 
     @Override
-    @NotNull
-    public List<String> getLore() {
-        return lore;
+    public @NotNull List<Component> getLore() {
+        return this.lore;
     }
 
     @Override
-    public void setLore(@NotNull List<String> lore) {
-        this.lore = StringUtil.color(new ArrayList<>(lore));
+    public void setLore(@NotNull List<Component> lore) {
+        this.lore = lore;
     }
+
 }

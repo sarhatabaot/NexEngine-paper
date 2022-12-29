@@ -1,5 +1,6 @@
 package su.nexmedia.engine.api.menu;
 
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,16 +23,15 @@ public interface IMenu extends ICleanable {
 
     Map<Player, IMenu> PLAYER_MENUS = new HashMap<>();
 
-    @Nullable
-    static IMenu getMenu(@NotNull Player player) {
+    static @Nullable IMenu getMenu(@NotNull Player player) {
         return PLAYER_MENUS.get(player);
     }
 
     @NotNull UUID getId();
 
-    @NotNull String getTitle();
+    @NotNull Component getTitle();
 
-    void setTitle(@NotNull String title);
+    void setTitle(@NotNull Component title);
 
     int getSize();
 
@@ -49,26 +49,22 @@ public interface IMenu extends ICleanable {
 
     @NotNull Map<Player, List<IMenuItem>> getUserItemsMap();
 
-    @NotNull
-    default List<IMenuItem> getUserItems(@NotNull Player player) {
+    default @NotNull List<IMenuItem> getUserItems(@NotNull Player player) {
         return this.getUserItemsMap().computeIfAbsent(player, p -> new ArrayList<>());
     }
 
-    @Nullable
-    default IMenuItem getItem(@NotNull String id) {
+    default @Nullable IMenuItem getItem(@NotNull String id) {
         return this.getItemsMap().get(id.toLowerCase());
     }
 
-    @Nullable
-    default IMenuItem getItem(int slot) {
+    default @Nullable IMenuItem getItem(int slot) {
         return this.getItemsMap().values().stream()
             .filter(item -> ArrayUtils.contains(item.getSlots(), slot))
             .max(Comparator.comparingInt(m -> m.getType() == null || m.getType() == MenuItemType.NONE ? -1 : m.getType().ordinal()))
             /*.findFirst()*/.orElse(null);
     }
 
-    @Nullable
-    default IMenuItem getItem(@NotNull Player player, int slot) {
+    default @Nullable IMenuItem getItem(@NotNull Player player, int slot) {
         return this.getUserItems(player).stream()
             .filter(item -> ArrayUtils.contains(item.getSlots(), slot))
             .max(Comparator.comparingInt(m -> m.getType() == null || m.getType() == MenuItemType.NONE ? -1 : m.getType().ordinal()))
@@ -111,8 +107,7 @@ public interface IMenu extends ICleanable {
         return this.getViewers().contains(player);
     }
 
-    @NotNull
-    default Inventory getInventory() {
+    default @NotNull Inventory getInventory() {
         return Bukkit.getServer().createInventory(null, this.getSize(), this.getTitle());
     }
 
@@ -203,8 +198,7 @@ public interface IMenu extends ICleanable {
 
     }
 
-    @Nullable
-    default MenuItemDisplay onItemDisplayPrepare(@NotNull Player player, @NotNull IMenuItem menuItem) {
+    default @Nullable MenuItemDisplay onItemDisplayPrepare(@NotNull Player player, @NotNull IMenuItem menuItem) {
         if (this.isAnimationEnabled() && menuItem.isAnimationEnabled()) {
             String displayId = menuItem.getAnimationFrames()[menuItem.getAnimationFrameCurrent()];
             MenuItemDisplay display = menuItem.getDisplay(displayId);

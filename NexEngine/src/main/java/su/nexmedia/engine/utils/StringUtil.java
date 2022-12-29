@@ -1,20 +1,30 @@
 package su.nexmedia.engine.utils;
 
-import net.md_5.bungee.api.ChatColor;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Color;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexEngine;
+import su.nexmedia.engine.api.manager.IPlaceholder;
+import su.nexmedia.engine.hooks.Hooks;
 import su.nexmedia.engine.utils.random.Rnd;
 
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StringUtil {
 
-    public static final Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]{6})");
+    public static final char AMPERSAND_CHAR = LegacyComponentSerializer.AMPERSAND_CHAR;
+
+    @Deprecated public static final Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]{6})");
 
     public static @NotNull String oneSpace(@NotNull String str) {
         return str.trim().replaceAll("\\s+", " ");
@@ -24,16 +34,135 @@ public class StringUtil {
         return str.trim().replaceAll("\\s+", "");
     }
 
+    /**
+     * Translates ampersand ({@code &}) color codes into section ({@code §}) color codes.
+     * <p>
+     * The translation supports three different RGB formats: 1) Legacy Mojang color and formatting codes (such as §a or
+     * §l), 2) Adventure-specific RGB format (such as §#a25981) and  3) BungeeCord RGB color code format (such as
+     * §x§a§2§5§9§8§1).
+     *
+     * @param str a legacy text where its color codes are in <b>ampersand</b> {@code &} format
+     *
+     * @return a legacy text where its color codes are in <b>section</b> {@code §} format
+     */
     public static @NotNull String color(@NotNull String str) {
-        return colorHex(ChatColor.translateAlternateColorCodes('&', colorFix(str)));
+        return LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy(AMPERSAND_CHAR).deserialize(str));
+    }
+
+    public static @NotNull Component asComponent(@NotNull String miniMessage) {
+        return MiniMessage.miniMessage().deserialize(miniMessage);
+    }
+
+    public static @NotNull List<Component> asComponent(@NotNull List<String> miniMessage) {
+        return miniMessage.stream().map(StringUtil::asComponent).collect(Collectors.toList());
+    }
+
+    public static @NotNull String asMiniMessage(@NotNull Component component) {
+        return MiniMessage.miniMessage().serialize(component);
+    }
+
+    public static @NotNull List<String> asMiniMessage(@NotNull List<Component> component) {
+        return component.stream().map(StringUtil::asMiniMessage).collect(Collectors.toList());
+    }
+
+    /**
+     * Strips all MiniMessage tags from given text.
+     *
+     * @param miniMessage a text in MiniMessage format
+     *
+     * @return a plain text
+     */
+    public static @NotNull String stripTags(@NotNull String miniMessage) {
+        return MiniMessage.miniMessage().stripTags(miniMessage);
+    }
+
+    /**
+     * Converts given Component into plain text.
+     *
+     * @param component a text of Component
+     *
+     * @return a plain text
+     */
+    public static @NotNull String asPlainText(@NotNull Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
+    }
+
+    /**
+     * Converts given legacy text into plain text.
+     *
+     * @param legacy a text containing legacy color codes
+     *
+     * @return a plain text
+     */
+    public static @NotNull String asPlainText(@NotNull String legacy) {
+        return PlainTextComponentSerializer.plainText().serialize(LegacyComponentSerializer.legacySection().deserialize(legacy));
+    }
+
+    /**
+     * Sets the PAPI placeholders in given component.
+     *
+     * @param player the player
+     * @param component the component to set placeholders
+     *
+     * @return the component with all placeholders parsed
+     */
+    public static Component setPlaceholderAPI(@NotNull Player player, @NotNull Component component) {
+        if (!Hooks.hasPlaceholderAPI()) return component;
+
+        Pattern pattern = PlaceholderAPI.getPlaceholderPattern();
+        return component.replaceText(config -> {
+            config.match(pattern);
+            config.replacement((matchResult, builder) -> {
+                String matched = matchResult.group();
+                String replaced = PlaceholderAPI.setPlaceholders(player, matched);
+                return StringUtil.asComponent(replaced);
+            });
+        });
+    }
+
+    /**
+     * Applies the string replacer to given component.
+     *
+     * @param replacer a string replacer
+     * @param component a component which the string replacer applies to
+     *
+     * @return the component modified by the string replacer
+     */
+    @Contract(pure = true)
+    public static @NotNull Component applyStringReplacer(@NotNull UnaryOperator<String> replacer, @NotNull Component component) {
+        return component.replaceText(config -> {
+            config.match(IPlaceholder.PERCENT_PATTERN);
+            config.replacement((matchResult, builder) -> {
+                String matched = matchResult.group();
+                String replaced = replacer.apply(matched);
+                return StringUtil.asComponent(replaced);
+            });
+        });
+    }
+
+    /**
+     * Applies the string replacer to given component list.
+     *
+     * @param replacer a string replacer
+     * @param component a component list which the string replacer applies to
+     *
+     * @return the component list modified by the string replacer
+     */
+    public static @NotNull List<Component> applyStringReplacer(@NotNull UnaryOperator<String> replacer, @NotNull List<Component> component) {
+        List<Component> replaced = new ArrayList<>();
+        for (Component line : component) {
+            replaced.add(applyStringReplacer(replacer, line));
+        }
+        return replaced;
     }
 
     /**
      * Removes multiple color codes that are 'color of color'. Example: {@code &a&b&cText} -> {@code &cText}.
      *
-     * @param str String to fix.
-     * @return A string with a proper color codes formatting.
+     * @param str a string to fix
+     * @return a string with a proper color codes formatting
      */
+    @Deprecated
     public static @NotNull String colorFix(@NotNull String str) {
         return NexEngine.get().getNMS().fixColors(str);
     }
@@ -52,47 +181,37 @@ public class StringUtil {
         return Color.fromRGB(red, green, blue);
     }
 
+    /**
+     * @deprecated in favor of {@link #color(String)}
+     */
+    @Deprecated
     public static @NotNull String colorHex(@NotNull String str) {
-        Matcher matcher = HEX_PATTERN.matcher(str);
-        StringBuilder buffer = new StringBuilder(str.length() + 4 * 8);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            matcher.appendReplacement(buffer, ChatColor.COLOR_CHAR + "x" + ChatColor.COLOR_CHAR + group.charAt(0) + ChatColor.COLOR_CHAR + group.charAt(1) + ChatColor.COLOR_CHAR + group.charAt(2) + ChatColor.COLOR_CHAR + group.charAt(3) + ChatColor.COLOR_CHAR + group.charAt(4) + ChatColor.COLOR_CHAR + group.charAt(5));
-        }
-        return matcher.appendTail(buffer).toString();
+        return color(str);
     }
 
     public static @NotNull String colorHexRaw(@NotNull String str) {
-        StringBuilder buffer = new StringBuilder(str);
-
-        int index;
-        while ((index = buffer.toString().indexOf(ChatColor.COLOR_CHAR + "x")) >= 0) {
-            int count = 0;
-            buffer.replace(index, index + 2, "#");
-
-            for (int point = index + 1; count < 6; point += 1) {
-                buffer.deleteCharAt(point);
-                count++;
-            }
-        }
-
-        return buffer.toString();
+        return LegacyComponentSerializer.legacyAmpersand().serialize(LegacyComponentSerializer.legacySection().deserialize(str));
     }
 
     public static @NotNull String colorRaw(@NotNull String str) {
-        return str.replace(ChatColor.COLOR_CHAR, '&');
+        return str.replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR);
     }
 
+    /**
+     * @deprecated in favor of {@link #asPlainText(String)}
+     */
+    @Deprecated
     public static @NotNull String colorOff(@NotNull String str) {
-        String off = ChatColor.stripColor(str);
-        return off == null ? "" : off;
+        return StringUtil.asPlainText(str);
     }
 
+    @Deprecated
     public static @NotNull List<String> color(@NotNull List<String> list) {
         list.replaceAll(StringUtil::color);
         return list;
     }
 
+    @Deprecated
     public static @NotNull Set<String> color(@NotNull Set<String> list) {
         return new HashSet<>(StringUtil.color(new ArrayList<>(list)));
     }
@@ -193,8 +312,8 @@ public class StringUtil {
     }
 
     /**
-     * @param original List to remove empty lines from.
-     * @return A list with no multiple empty lines in a row.
+     * @param original a list to remove empty lines from
+     * @return a list with no multiple empty lines in a row
      */
     public static @NotNull List<String> stripEmpty(@NotNull List<String> original) {
         List<String> stripped = new ArrayList<>();
@@ -209,6 +328,20 @@ public class StringUtil {
         return stripped;
     }
 
+    public static @NotNull List<Component> stripEmptyLines(@NotNull List<Component> original) {
+        List<Component> stripped = new ArrayList<>();
+        for (int index = 0; index < original.size(); index++) {
+            Component originLine = original.get(index);
+            String plainLine = StringUtil.asPlainText(originLine);
+            if (plainLine.isEmpty()) {
+                String last = stripped.isEmpty() ? null : StringUtil.asPlainText(stripped.get(stripped.size() - 1));
+                if (last == null || last.isEmpty() || index == (original.size() - 1)) continue;
+            }
+            stripped.add(originLine);
+        }
+        return stripped;
+    }
+
     public static @NotNull List<String> getByFirstLetters(@NotNull String arg, @NotNull List<String> source) {
         List<String> ret = new ArrayList<>();
         List<String> sugg = new ArrayList<>(source);
@@ -218,7 +351,7 @@ public class StringUtil {
     }
 
     public static @NotNull String extractCommandName(@NotNull String cmd) {
-        String cmdFull = colorOff(cmd).split(" ")[0];
+        String cmdFull = StringUtil.asPlainText(cmd).split(" ")[0];
         String cmdName = cmdFull.replace("/", "").replace("\\/", "");
         String[] pluginPrefix = cmdName.split(":");
         if (pluginPrefix.length == 2) {

@@ -1,5 +1,6 @@
 package su.nexmedia.engine.api.config;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -177,17 +178,23 @@ public class JYML extends YamlConfiguration {
             writer.write(this, path);
         }
         else {
-            if (o instanceof String str) {
-                o = StringUtil.colorRaw(str);
+            if (o instanceof String) {
+                // Keep it as it is
+            }
+            else if (o instanceof Component component) {
+                // Serialize Components into strings in MiniMessage format
+                o = StringUtil.asMiniMessage(component);
             }
             else if (o instanceof Set<?> set) {
                 List<Object> list = new ArrayList<>(set);
-                list.replaceAll(obj -> obj instanceof String str ? StringUtil.colorRaw(str) : obj);
+                // Serialize Components into Strings in MiniMessage format
+                list.replaceAll(obj -> obj instanceof Component component ? StringUtil.asMiniMessage(component) : obj);
                 o = list;
             }
             else if (o instanceof List<?> set) {
                 List<Object> list = new ArrayList<>(set);
-                list.replaceAll(obj -> obj instanceof String str ? StringUtil.colorRaw(str) : obj);
+                // Serialize Components into Strings in MiniMessage format
+                list.replaceAll(obj -> obj instanceof Component component ? StringUtil.asMiniMessage(component) : obj);
                 o = list;
             }
             else if (o instanceof Map<?, ?> map) {
@@ -362,8 +369,9 @@ public class JYML extends YamlConfiguration {
         }
 
         String name = this.getString(path + "Name");
-        meta.setDisplayName(name != null ? StringUtil.color(name) : null);
-        meta.setLore(StringUtil.color(this.getStringList(path + "Lore")));
+        meta.displayName(name != null ? StringUtil.asComponent(name) : null);
+        List<Component> lore = this.getComponentList(path + "Lore");
+        meta.lore(lore);
 
         for (String sKey : this.getSection(path + "Enchants")) {
             Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(sKey.toLowerCase()));
@@ -479,8 +487,8 @@ public class JYML extends YamlConfiguration {
             this.set(path + "Durability", damageable.getDamage());
         }
 
-        this.set(path + "Name", meta.getDisplayName());
-        this.set(path + "Lore", meta.getLore());
+        this.set(path + "Name", meta.displayName());
+        this.set(path + "Lore", meta.lore());
 
         for (Map.Entry<Enchantment, Integer> entry : meta.getEnchants().entrySet()) {
             this.set(path + "Enchants." + entry.getKey().getKey().getKey(), entry.getValue());
@@ -541,6 +549,26 @@ public class JYML extends YamlConfiguration {
             return;
         }
         this.set(path, pluginItem.asReference());
+    }
+
+    @NotNull
+    public Component getComponent(@NotNull String path) {
+        String val = this.getString(path);
+        if (val != null) return StringUtil.asComponent(val);
+        else return Component.empty();
+    }
+
+    @NotNull
+    public Component getComponent(@NotNull String path, @NotNull Component def) {
+        String val = this.getString(path);
+        if (val != null) return StringUtil.asComponent(val);
+        else return def;
+    }
+
+    @NotNull
+    public List<Component> getComponentList(@NotNull String path) {
+        List<String> val = this.getStringList(path);
+        return StringUtil.asComponent(val);
     }
 
     @Nullable
