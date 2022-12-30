@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.ComponentUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -77,16 +77,6 @@ public class JOption<T> {
     }
 
     @NotNull
-    public static JOption<Component> of(@NotNull String path, @NotNull String defaultValue, @NotNull String... description) {
-        return new JOption<>(path, READER_COMPONENT, StringUtil.asComponent(defaultValue), description);
-    }
-
-    @NotNull
-    public static JOption<List<Component>> of(@NotNull String path, @NotNull List<String> defaultValue, @NotNull String... description) {
-        return new JOption<>(path, READER_LIST_COMPONENT, StringUtil.asComponent(defaultValue), description);
-    }
-
-    @NotNull
     public static JOption<ItemStack> create(@NotNull String path, @NotNull ItemStack defaultValue, @NotNull String... description) {
         return new JOption<>(path, READER_ITEM, defaultValue, description);
     }
@@ -94,6 +84,16 @@ public class JOption<T> {
     @NotNull
     public static <E extends Enum<E>> JOption<E> create(@NotNull String path, @NotNull Class<E> clazz, @NotNull E defaultValue, @NotNull String... description) {
         return new JOption<>(path, ((cfg, path1, def) -> cfg.getEnum(path1, clazz, defaultValue)), defaultValue, description);
+    }
+
+    @NotNull
+    public static JOption<Component> createComponent(@NotNull String path, @NotNull String defaultValue, @NotNull String... description) {
+        return new JOption<>(path, READER_COMPONENT, ComponentUtil.asComponent(defaultValue), description);
+    }
+
+    @NotNull
+    public static JOption<List<Component>> createComponentList(@NotNull String path, @NotNull List<String> defaultValue, @NotNull String... description) {
+        return new JOption<>(path, READER_LIST_COMPONENT, ComponentUtil.asComponent(defaultValue), description);
     }
 
     @NotNull

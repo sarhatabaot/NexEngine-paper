@@ -14,6 +14,7 @@ import su.nexmedia.engine.api.editor.EditorButtonType;
 import su.nexmedia.engine.api.lang.LangKey;
 import su.nexmedia.engine.api.lang.LangMessage;
 import su.nexmedia.engine.api.manager.AbstractManager;
+import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.Reflex;
 import su.nexmedia.engine.utils.StringUtil;
 
@@ -177,7 +178,7 @@ public class LangManager<P extends NexPlugin<P>> extends AbstractManager<P> {
             this.getConfig().addMissing(path + "Name", buttonType.getName());
             this.getConfig().addMissing(path + "Lore", buttonType.getLore());
 
-            buttonType.setName(this.getConfig().getComponent(path + "Name", StringUtil.asComponent(nameRaw)));
+            buttonType.setName(this.getConfig().getComponent(path + "Name", ComponentUtil.asComponent(nameRaw)));
             buttonType.setLore(this.getConfig().getComponentList(path + "Lore"));
         }
     }

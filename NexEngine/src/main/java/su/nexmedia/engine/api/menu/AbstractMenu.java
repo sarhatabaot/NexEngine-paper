@@ -15,9 +15,9 @@ import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.api.type.ClickType;
+import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
-import su.nexmedia.engine.utils.StringUtil;
 
 import java.util.*;
 
@@ -43,7 +43,7 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     }
 
     public AbstractMenu(@NotNull P plugin, @NotNull String title, int size) {
-        this(plugin, StringUtil.asComponent(title), size);
+        this(plugin, ComponentUtil.asComponent(title), size);
     }
 
     public AbstractMenu(@NotNull P plugin, @NotNull Component title, int size) {
@@ -168,7 +168,7 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     }
 
     public void onItemPrepare(@NotNull Player player, @NotNull MenuItem menuItem, @NotNull ItemStack item) {
-        ItemUtil.setPlaceholderAPI(player, item);
+        ItemUtil.setPlaceholderAPI(item, player);
     }
 
     public void onClick(@NotNull Player player, @Nullable ItemStack item, int slot, @NotNull InventoryClickEvent e) {

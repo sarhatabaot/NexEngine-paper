@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.editor.EditorButtonType;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.ComponentUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +29,8 @@ public enum MenuItemType implements EditorButtonType {
 
     MenuItemType(@NotNull Material material, @NotNull String name, @NotNull String... lore) {
         this.material = material;
-        this.setName(StringUtil.asComponent(name));
-        this.setLore(StringUtil.asComponent(Arrays.asList(lore)));
+        this.setName(ComponentUtil.asComponent(name));
+        this.setLore(ComponentUtil.asComponent(Arrays.asList(lore)));
     }
 
     MenuItemType(@NotNull Material material, @NotNull Component name, @NotNull Component... lore) {

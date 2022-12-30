@@ -36,25 +36,25 @@ public class MessageUtil {
     }
 
     public static void sendActionBar(@NotNull Audience audience, @NotNull String message) {
-        audience.sendActionBar(StringUtil.asComponent(message));
+        audience.sendActionBar(ComponentUtil.asComponent(message));
     }
 
     public static void sendMessage(@NotNull Audience audience, String message) {
-        audience.sendMessage(StringUtil.asComponent(message));
+        audience.sendMessage(ComponentUtil.asComponent(message));
     }
 
     public static void showTitle(@NotNull Audience audience, @NotNull String title, @NotNull String subTitle, int fadeIn, int stay, int fadeOut) {
         audience.showTitle(Title.title(
-            StringUtil.asComponent(title),
-            StringUtil.asComponent(subTitle),
+            ComponentUtil.asComponent(title),
+            ComponentUtil.asComponent(subTitle),
             Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(stay), Ticks.duration(fadeOut))
         ));
     }
 
     public static void showTitle(@NotNull Audience audience, @NotNull String title, @NotNull String subTitle) {
         audience.showTitle(Title.title(
-            StringUtil.asComponent(title),
-            StringUtil.asComponent(subTitle)
+            ComponentUtil.asComponent(title),
+            ComponentUtil.asComponent(subTitle)
         ));
     }
 

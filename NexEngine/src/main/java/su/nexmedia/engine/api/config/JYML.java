@@ -148,9 +148,12 @@ public class JYML extends YamlConfiguration {
             if (value instanceof String str) {
                 // Keep it as it is
             }
+            else if (value instanceof Component component) {
+                value = ComponentUtil.asMiniMessage(component);
+            }
             else if (value instanceof Collection<?> collection) {
                 List<Object> list = new ArrayList<>(collection);
-                list.replaceAll(obj -> obj instanceof Component component ? StringUtil.asMiniMessage(component) : obj);
+                list.replaceAll(obj -> obj instanceof Component component ? ComponentUtil.asMiniMessage(component) : obj);
                 value = list;
             }
             else if (value instanceof Location location) {
@@ -318,7 +321,7 @@ public class JYML extends YamlConfiguration {
         }
 
         String name = this.getString(path + "Name");
-        meta.displayName(name != null ? StringUtil.asComponent(name) : null);
+        meta.displayName(name != null ? ComponentUtil.asComponent(name) : null);
         List<Component> lore = this.getComponentList(path + "Lore");
         meta.lore(lore);
 
@@ -505,20 +508,20 @@ public class JYML extends YamlConfiguration {
     @NotNull
     public Component getComponent(@NotNull String path) {
         String val = this.getString(path);
-        if (val != null) return StringUtil.asComponent(val);
+        if (val != null) return ComponentUtil.asComponent(val);
         else return Component.empty();
     }
 
     @NotNull
     public Component getComponent(@NotNull String path, @NotNull Component def) {
         String val = this.getString(path);
-        if (val != null) return StringUtil.asComponent(val);
+        if (val != null) return ComponentUtil.asComponent(val);
         else return def;
     }
 
     @NotNull
     public List<Component> getComponentList(@NotNull String path) {
         List<String> val = this.getStringList(path);
-        return StringUtil.asComponent(val);
+        return ComponentUtil.asComponent(val);
     }
 }

@@ -85,21 +85,21 @@ public class ItemUtil {
         return opt.map(Property::getValue).orElse(null);
     }
 
-    public static void setPlaceholderAPI(@NotNull Player player, @NotNull ItemStack item) {
+    public static void setPlaceholderAPI(@NotNull ItemStack item, @NotNull Player player) {
         if (!Hooks.hasPlaceholderAPI()) return;
 
         item.editMeta(meta -> {
             // Replace displayName
             if (meta.hasDisplayName()) {
                 Component original = Objects.requireNonNull(meta.displayName());
-                Component replaced = StringUtil.setPlaceholderAPI(player, original);
+                Component replaced = ComponentUtil.setPlaceholderAPI(player, original);
                 meta.displayName(replaced);
             }
 
             // Replace lore
             if (meta.hasLore()) {
                 List<Component> original = Objects.requireNonNull(meta.lore());
-                List<Component> replaced = original.stream().map(c -> StringUtil.setPlaceholderAPI(player, c)).collect(Collectors.toList());
+                List<Component> replaced = original.stream().map(c -> ComponentUtil.setPlaceholderAPI(player, c)).collect(Collectors.toList());
                 meta.lore(replaced);
             }
         });
@@ -112,7 +112,7 @@ public class ItemUtil {
         // Replace item name
         Component oldName = meta.displayName();
         if (oldName != null) {
-            Component newName = StringUtil.applyStringReplacer(replacer, oldName);
+            Component newName = ComponentUtil.replace(oldName, replacer);
             meta.displayName(newName);
         }
 
@@ -120,8 +120,8 @@ public class ItemUtil {
         List<Component> oldLore = meta.lore();
         List<Component> newLore;
         if (oldLore != null) {
-            newLore = StringUtil.applyStringReplacer(replacer, oldLore);
-            meta.lore(StringUtil.stripEmptyLines(newLore));
+            newLore = ComponentUtil.replace(oldLore, replacer);
+            meta.lore(ComponentUtil.stripEmpty(newLore));
         }
 
         item.setItemMeta(meta);
@@ -134,20 +134,8 @@ public class ItemUtil {
         List<Component> oldLore = meta.lore();
         if (oldLore == null) return;
 
-        List<Component> newLore = new ArrayList<>();
-        Component placeholderComponent = Component.text(placeholder).compact(); // TODO does it work with Component#contains ?
-        for (Component oldLine : oldLore) {
-            if (oldLine.compact().contains(placeholderComponent, Component.EQUALS)) {
-                replacer.forEach(lineRep -> {
-                    UnaryOperator<String> stringReplacer = str -> str.replace(placeholder, lineRep);
-                    Component newLine = StringUtil.applyStringReplacer(stringReplacer, oldLine);
-                    newLore.add(newLine);
-                });
-                continue;
-            }
-            newLore.add(oldLine);
-        }
-        meta.lore(StringUtil.stripEmptyLines(newLore));
+        List<Component> newLore = ComponentUtil.replace(oldLore, placeholder, false, ComponentUtil.asComponent(replacer));
+        meta.lore(ComponentUtil.stripEmpty(newLore));
         item.setItemMeta(meta);
     }
 
