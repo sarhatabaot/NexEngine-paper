@@ -65,7 +65,7 @@ dependencies {
 }
 
 group = "su.nexmedia"
-version = "2.2.7"
+version = "2.2.8"
 
 java {
     toolchain {

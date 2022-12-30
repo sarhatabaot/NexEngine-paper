@@ -123,7 +123,7 @@ public class StringUtil {
     /**
      * Applies the string replacer to given component.
      *
-     * @param replacer a string replacer
+     * @param replacer  a string replacer
      * @param component a component which the string replacer applies to
      *
      * @return the component modified by the string replacer
@@ -143,7 +143,7 @@ public class StringUtil {
     /**
      * Applies the string replacer to given component list.
      *
-     * @param replacer a string replacer
+     * @param replacer  a string replacer
      * @param component a component list which the string replacer applies to
      *
      * @return the component list modified by the string replacer
@@ -160,6 +160,7 @@ public class StringUtil {
      * Removes multiple color codes that are 'color of color'. Example: {@code &a&b&cText} -> {@code &cText}.
      *
      * @param str a string to fix
+     *
      * @return a string with a proper color codes formatting
      */
     @Deprecated
@@ -242,13 +243,10 @@ public class StringUtil {
         return getDouble(input, def, false);
     }
 
-    public static double getDouble(@NotNull String input, double def, boolean allowNega) {
+    public static double getDouble(@NotNull String input, double def, boolean allowNegative) {
         try {
             double amount = Double.parseDouble(input);
-            if (amount < 0.0 && !allowNega) {
-                throw new NumberFormatException();
-            }
-            return amount;
+            return (amount < 0D && !allowNegative ? def : amount);
         } catch (NumberFormatException ex) {
             return def;
         }
@@ -258,19 +256,21 @@ public class StringUtil {
         return getInteger(input, def, false);
     }
 
-    public static int getInteger(@NotNull String input, int def, boolean nega) {
-        return (int) getDouble(input, def, nega);
+    public static int getInteger(@NotNull String input, int def, boolean allowNegative) {
+        return (int) getDouble(input, def, allowNegative);
     }
 
     public static int[] getIntArray(@NotNull String str) {
-        String[] raw = str.replaceAll("\\s", "").split(",");
-        int[] slots = new int[raw.length];
-        for (int i = 0; i < raw.length; i++) {
+        String[] split = noSpace(str).split(",");
+        int[] array = new int[split.length];
+        for (int index = 0; index < split.length; index++) {
             try {
-                slots[i] = Integer.parseInt(raw[i].trim());
-            } catch (NumberFormatException ignored) {}
+                array[index] = Integer.parseInt(split[index]);
+            } catch (NumberFormatException e) {
+                array[index] = 0;
+            }
         }
-        return slots;
+        return array;
     }
 
     public static @NotNull String capitalizeFully(@NotNull String str) {
@@ -313,6 +313,7 @@ public class StringUtil {
 
     /**
      * @param original a list to remove empty lines from
+     *
      * @return a list with no multiple empty lines in a row
      */
     public static @NotNull List<String> stripEmpty(@NotNull List<String> original) {
@@ -342,12 +343,29 @@ public class StringUtil {
         return stripped;
     }
 
-    public static @NotNull List<String> getByFirstLetters(@NotNull String arg, @NotNull List<String> source) {
-        List<String> ret = new ArrayList<>();
-        List<String> sugg = new ArrayList<>(source);
-        org.bukkit.util.StringUtil.copyPartialMatches(arg, sugg, ret);
-        Collections.sort(ret);
-        return ret;
+    @NotNull
+    public static List<String> getByPartialMatches(@NotNull List<String> originals, @NotNull String token, int steps) {
+        token = token.toLowerCase();
+
+        int[] parts = NumberUtil.splitIntoParts(token.length(), steps);
+        int lastIndex = 0;
+        StringBuilder builder = new StringBuilder();
+        for (int partSize : parts) {
+            String sub = token.substring(lastIndex, lastIndex + partSize);
+            lastIndex += partSize;
+
+            builder.append(sub).append("(?:.*)");
+        }
+
+        Pattern pattern = Pattern.compile(builder.toString());
+        List<String> list = new ArrayList<>(originals.stream().filter(orig -> pattern.matcher(orig.toLowerCase()).matches()).toList());
+        /*for (String src : originals) {
+            if (src.toLowerCase().startsWith(token.toLowerCase())) {
+                list.add(src);
+            }
+        }*/
+        Collections.sort(list);
+        return list;
     }
 
     public static @NotNull String extractCommandName(@NotNull String cmd) {
@@ -362,7 +380,7 @@ public class StringUtil {
     }
 
     public static boolean isCustomBoolean(@NotNull String str) {
-        String[] customs = new String[]{"0","1","on","off","true","false","yes","no"};
+        String[] customs = new String[]{"0", "1", "on", "off", "true", "false", "yes", "no"};
         return Stream.of(customs).collect(Collectors.toSet()).contains(str.toLowerCase());
     }
 

@@ -49,9 +49,8 @@ public interface NMS {
 
     @NotNull ItemStack damageItem(@NotNull ItemStack item, int amount, @Nullable Player player);
 
-    @NotNull
-    @Deprecated
-    String fixColors(@NotNull String str);
+    @NotNull String fixColors(@NotNull String str);
+
 
     double getDefaultDamage(@NotNull ItemStack itemStack);
 
@@ -61,13 +60,17 @@ public interface NMS {
 
     double getDefaultToughness(@NotNull ItemStack itemStack);
 
-    boolean isWeapon(@NotNull ItemStack itemStack);
+
+    boolean isTool(@NotNull ItemStack itemStack);
+
+    boolean isArmor(@NotNull ItemStack itemStack);
+
+    boolean isWearable(@NotNull ItemStack itemStack);
+
 
     boolean isSword(@NotNull ItemStack itemStack);
 
     boolean isAxe(@NotNull ItemStack itemStack);
-
-    boolean isTrident(@NotNull ItemStack itemStack);
 
     boolean isPickaxe(@NotNull ItemStack itemStack);
 
@@ -75,9 +78,6 @@ public interface NMS {
 
     boolean isHoe(@NotNull ItemStack itemStack);
 
-    boolean isTool(@NotNull ItemStack itemStack);
-
-    boolean isArmor(@NotNull ItemStack itemStack);
 
     boolean isHelmet(@NotNull ItemStack itemStack);
 

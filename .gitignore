@@ -25,6 +25,9 @@
 /NMS/build
 /NMS/target
 
+/PlayerBlockTracker/build
+/PlayerBlockTracker/target
+
 # Output jars
 
 /NexEngine*.jar

@@ -56,7 +56,7 @@ bukkit {
     authors = listOf("NightExpress")
     softDepend = listOf("Vault", "Brewery", "ItemsAdder", "MMOItems", "MythicLib", "InteractiveBooks")
     load = STARTUP
-    libraries = listOf("com.zaxxer:HikariCP:5.0.1")
+    libraries = listOf("com.zaxxer:HikariCP:5.0.1", "it.unimi.dsi:fastutil:8.5.11")
 }
 
 tasks {

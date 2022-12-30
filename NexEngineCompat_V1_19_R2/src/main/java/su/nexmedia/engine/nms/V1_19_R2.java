@@ -128,7 +128,8 @@ public class V1_19_R2 implements NMS {
 
         try {
             NbtIo.write(nbtTagCompoundItem, dataOutput);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -164,15 +165,31 @@ public class V1_19_R2 implements NMS {
         return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
-    @Deprecated
     @Override
     @NotNull
     public String fixColors(@NotNull String str) {
-        str = str.replace("\n", "%n%"); // CraftChatMessage wipes all lines out.
+        Component baseComponent = CraftChatMessage.fromStringOrNull(str, true);
+        return CraftChatMessage.fromComponent(baseComponent);
+    }
 
-        Component baseComponent = CraftChatMessage.fromStringOrNull(str);
-        String singleColor = CraftChatMessage.fromComponent(baseComponent);
-        return singleColor.replace("%n%", "\n");
+    @Override
+    public double getDefaultDamage(@NotNull ItemStack itemStack) {
+        return this.getAttributeValue(itemStack, Attributes.ATTACK_DAMAGE);
+    }
+
+    @Override
+    public double getDefaultSpeed(@NotNull ItemStack itemStack) {
+        return this.getAttributeValue(itemStack, Attributes.MOVEMENT_SPEED);
+    }
+
+    @Override
+    public double getDefaultArmor(@NotNull ItemStack itemStack) {
+        return this.getAttributeValue(itemStack, Attributes.ARMOR);
+    }
+
+    @Override
+    public double getDefaultToughness(@NotNull ItemStack itemStack) {
+        return this.getAttributeValue(itemStack, Attributes.ARMOR_TOUGHNESS);
     }
 
     @Nullable
@@ -182,11 +199,14 @@ public class V1_19_R2 implements NMS {
 
         if (item instanceof ArmorItem armorItem) {
             attMap = armorItem.getDefaultAttributeModifiers(armorItem.getSlot());
-        } else if (item instanceof DiggerItem diggerItem) {
+        }
+        else if (item instanceof DiggerItem diggerItem) {
             attMap = diggerItem.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND);
-        } else if (item instanceof SwordItem swordItem) {
+        }
+        else if (item instanceof SwordItem swordItem) {
             attMap = swordItem.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND);
-        } else if (item instanceof TridentItem tridentItem) {
+        }
+        else if (item instanceof TridentItem tridentItem) {
             attMap = tridentItem.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND);
         }
 
@@ -201,10 +221,25 @@ public class V1_19_R2 implements NMS {
         return att.isEmpty() ? 0 : att.stream().findFirst().get().getAmount();
     }
 
+
     @Override
-    public boolean isWeapon(@NotNull ItemStack itemStack) {
-        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTrident(itemStack);
+    public boolean isTool(@NotNull ItemStack itemStack) {
+        Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
+        return item instanceof DiggerItem;
     }
+
+    @Override
+    public boolean isArmor(@NotNull ItemStack itemStack) {
+        Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
+        return item instanceof ArmorItem;
+    }
+
+    @Override
+    public boolean isWearable(@NotNull ItemStack itemStack) {
+        Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
+        return item instanceof Wearable;
+    }
+
 
     @Override
     public boolean isSword(@NotNull ItemStack itemStack) {
@@ -216,12 +251,6 @@ public class V1_19_R2 implements NMS {
     public boolean isAxe(@NotNull ItemStack itemStack) {
         Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
         return item instanceof AxeItem;
-    }
-
-    @Override
-    public boolean isTrident(@NotNull ItemStack itemStack) {
-        Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
-        return item instanceof TridentItem;
     }
 
     @Override
@@ -242,17 +271,6 @@ public class V1_19_R2 implements NMS {
         return item instanceof HoeItem;
     }
 
-    @Override
-    public boolean isTool(@NotNull ItemStack itemStack) {
-        Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
-        return item instanceof DiggerItem;
-    }
-
-    @Override
-    public boolean isArmor(@NotNull ItemStack itemStack) {
-        Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
-        return item instanceof ArmorItem;
-    }
 
     private boolean isArmorSlot(@NotNull ItemStack itemStack, @NotNull EquipmentSlot slot) {
         Item item = CraftItemStack.asNMSCopy(itemStack).getItem();
@@ -280,25 +298,5 @@ public class V1_19_R2 implements NMS {
     @Override
     public boolean isBoots(@NotNull ItemStack itemStack) {
         return this.isArmorSlot(itemStack, EquipmentSlot.FEET);
-    }
-
-    @Override
-    public double getDefaultDamage(@NotNull ItemStack itemStack) {
-        return this.getAttributeValue(itemStack, Attributes.ATTACK_DAMAGE);
-    }
-
-    @Override
-    public double getDefaultSpeed(@NotNull ItemStack itemStack) {
-        return this.getAttributeValue(itemStack, Attributes.MOVEMENT_SPEED);
-    }
-
-    @Override
-    public double getDefaultArmor(@NotNull ItemStack itemStack) {
-        return this.getAttributeValue(itemStack, Attributes.ARMOR);
-    }
-
-    @Override
-    public double getDefaultToughness(@NotNull ItemStack itemStack) {
-        return this.getAttributeValue(itemStack, Attributes.ARMOR_TOUGHNESS);
     }
 }

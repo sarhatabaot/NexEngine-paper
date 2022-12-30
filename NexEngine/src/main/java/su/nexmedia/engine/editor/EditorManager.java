@@ -12,11 +12,12 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.NexEngine;
+import su.nexmedia.engine.Version;
 import su.nexmedia.engine.api.editor.EditorInput;
 import su.nexmedia.engine.api.editor.EditorObject;
 import su.nexmedia.engine.api.manager.AbstractManager;
 import su.nexmedia.engine.api.manager.IListener;
-import su.nexmedia.engine.api.menu.IMenu;
+import su.nexmedia.engine.api.menu.AbstractMenu;
 import su.nexmedia.engine.lang.EngineLang;
 import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.MessageUtil;
@@ -29,18 +30,12 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class EditorManager extends AbstractManager<NexEngine> implements IListener {
 
-    private static final NexEngine                              ENGINE             = NexEngine.get();
-    private static final Map<Player, Map.Entry<IMenu, Integer>> EDITOR_CACHE_MENU  = new WeakHashMap<>();
-    private static final Map<Player, EditorObject<?, ?>>        EDITOR_CACHE_INPUT = new WeakHashMap<>();
+    private static final NexEngine                                        ENGINE             = NexEngine.get();
+    private static final Map<Player, Map.Entry<AbstractMenu<?>, Integer>> EDITOR_CACHE_MENU  = new WeakHashMap<>();
+    private static final Map<Player, EditorObject<?, ?>>                  EDITOR_CACHE_INPUT = new WeakHashMap<>();
 
     private static final String EXIT       = "#exit";
     private static final int    TITLE_STAY = Short.MAX_VALUE;
-
-    @Deprecated private static final String TIP_TITLE         = "<b><green>Editing";
-    @Deprecated private static final String ERROR_TITLE       = "<b><red>Error!";
-    @Deprecated public static final  String ERROR_NUM_INVALID = "<gray>Invalid Number!";
-    @Deprecated public static final  String ERROR_NUM_NOT_INT = "<gray>Number must be <white>Integer</white>!";
-    @Deprecated public static final  String ERROR_ENUM        = "<gray>Invalid Type! See in chat.";
 
     public EditorManager(@NotNull NexEngine plugin) {
         super(plugin);
@@ -73,7 +68,7 @@ public class EditorManager extends AbstractManager<NexEngine> implements IListen
     public static <T, E extends Enum<E>> void startEdit(@NotNull Player player, @NotNull T object, @NotNull E type, @NotNull EditorInput<T, E> input) {
         EDITOR_CACHE_INPUT.put(player, new EditorObject<>(object, type, input));
 
-        IMenu menu = IMenu.getMenu(player);
+        AbstractMenu<?> menu = AbstractMenu.getMenu(player);
         if (menu != null) {
             EDITOR_CACHE_MENU.put(player, new AbstractMap.SimpleEntry<>(menu, menu.getPage(player)));
         }
@@ -87,7 +82,7 @@ public class EditorManager extends AbstractManager<NexEngine> implements IListen
     public static void endEdit(@NotNull Player player, boolean msg) {
         EDITOR_CACHE_INPUT.remove(player);
 
-        Map.Entry<IMenu, Integer> entry = EDITOR_CACHE_MENU.remove(player);
+        Map.Entry<AbstractMenu<?>, Integer> entry = EDITOR_CACHE_MENU.remove(player);
         if (entry != null) {
             entry.getKey().open(player, entry.getValue());
         }
@@ -102,18 +97,25 @@ public class EditorManager extends AbstractManager<NexEngine> implements IListen
             return;
         }
 
+        boolean fixCommand = Version.isAbove(Version.V1_18_R2);
+
         TextComponent suggestedValues = items
             .stream()
             .sorted(String::compareTo)
-            .map(item -> text().content(item)
-                               .color(YELLOW)
-                               .hoverEvent(HoverEvent.showText(LinearComponents.linear(
-                                   GRAY, text("Click me to select "), WHITE, text(item)
-                               )))
-                               .clickEvent(
-                                   autoRun ? ClickEvent.runCommand("/" + item)
-                                           : ClickEvent.suggestCommand("/" + item)
-                               ))
+            .map(item -> {
+                TextComponent.Builder builder = text()
+                    .content(item)
+                    .color(YELLOW)
+                    .hoverEvent(HoverEvent.showText(LinearComponents.linear(
+                        GRAY, text("Click me to select "), WHITE, text(item)
+                    )));
+                if (autoRun && fixCommand && !item.startsWith("/")) item = "/" + item;
+                builder.clickEvent(
+                    autoRun ? ClickEvent.runCommand(item)
+                            : ClickEvent.suggestCommand(item)
+                );
+                return builder;
+            })
             .reduce((c1, c2) -> c1.append(text(" --- ").color(DARK_GRAY)).append(c2))
             .orElseThrow()
             .build();
