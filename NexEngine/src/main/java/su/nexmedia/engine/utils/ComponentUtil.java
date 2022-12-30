@@ -31,7 +31,7 @@ public class ComponentUtil {
 
     @Contract(pure = true)
     public static @NotNull String asMiniMessage(@NotNull Component component) {
-        return MiniMessage.miniMessage().serialize(component);
+        return MiniMessage.miniMessage().serialize(component.compact());
     }
 
     @Contract(pure = true)
