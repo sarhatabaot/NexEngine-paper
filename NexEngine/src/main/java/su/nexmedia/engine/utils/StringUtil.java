@@ -1,7 +1,7 @@
 package su.nexmedia.engine.utils;
 
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexEngine;
@@ -49,7 +49,7 @@ public class StringUtil {
      * @return a plain text
      */
     public static @NotNull String asPlainText(@NotNull String legacy) {
-        return PlainTextComponentSerializer.plainText().serialize(LegacyComponentSerializer.legacySection().deserialize(legacy));
+        return ChatColor.stripColor(legacy);
     }
 
     /**
