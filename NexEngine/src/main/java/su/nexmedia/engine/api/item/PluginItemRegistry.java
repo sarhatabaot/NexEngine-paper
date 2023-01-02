@@ -23,6 +23,17 @@ public final class PluginItemRegistry {
         constructors.remove(pluginId.toLowerCase());
     }
 
+    public static @NotNull ItemStack refreshItemStack(@NotNull ItemStack item) {
+        PluginItem<?> pluginItem = fromItemStackNullable(item);
+        if (pluginItem != null) {
+            ItemStack itemStack = pluginItem.createItemStack();
+            if (itemStack != null) {
+                return itemStack;
+            }
+        }
+        return item;
+    }
+
     public static @Nullable PluginItem<?> fromItemStackNullable(@Nullable ItemStack item) {
         if (item == null) return null;
         for (Map.Entry<String, Supplier<PluginItem<?>>> entry : constructors.entrySet()) {
