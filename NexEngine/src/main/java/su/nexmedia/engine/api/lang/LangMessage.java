@@ -25,9 +25,7 @@ public class LangMessage {
     @Deprecated private static final Pattern              PATTERN_MESSAGE_FULL   = Pattern.compile("(\\{message:)+(.+?)}+(.*)");
     @Deprecated private static final Map<String, Pattern> PATTERN_MESSAGE_PARAMS = new HashMap<>();
 
-    private static final Pattern PATTERN_OPTIONS = Pattern.compile("<\\!(.*?)\\!>");
-    //private static final Pattern PATTERN_NO_PREFIX = Pattern.compile("<noprefix>");
-    //private static final Pattern PATTERN_SOUND = Pattern.compile("sound" + OPTION_PATTERN);
+    private static final Pattern PATTERN_OPTIONS = Pattern.compile("<!(.*?)!>");
 
     static {
         for (String parameter : new String[]{"type", "prefix", "sound", "fadeIn", "stay", "fadeOut"}) {
@@ -228,7 +226,8 @@ public class LangMessage {
     public @NotNull List<String> asList() {
         if (this.isEmpty()) return Collections.emptyList();
         return Stream.of(this.getLocalized().split("\\\\n"))
-                     .filter(Predicate.not(String::isEmpty)).toList();
+                     .filter(Predicate.not(String::isEmpty))
+                     .toList();
     }
 
     /**

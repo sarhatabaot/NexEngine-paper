@@ -8,7 +8,7 @@ public class EngineLang {
     public static final LangKey CORE_COMMAND_HELP_LIST   = new LangKey("Core.Command.Help.List", """
         <gold><st>              </st><gold><b>[</b></gold> <yellow><b>%plugin_name_localized%</b></yellow> <gray>-</gray> <yellow><b>Commands</b></yellow> <gold><b>]</b></gold><gold><st>              </st></gold>
         <gray>
-        <gray>          <dark_red><b><></b></dark_red> <gray>- Required</gray> , <dark_green><b>[]</b></dark_green> <gray>- Optional</gray>
+        <gray>  <dark_red><b><></b></dark_red> <gray>- Required</gray> , <dark_green><b>[]</b></dark_green> <gray>- Optional</gray>
         <gray>
         <gold>▪ <yellow>/%command_label%</yellow> <gold>%command_usage%</gold> <gray>- %command_description%</gray>
         <gray>

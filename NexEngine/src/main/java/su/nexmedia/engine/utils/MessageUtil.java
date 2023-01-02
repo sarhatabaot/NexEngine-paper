@@ -7,19 +7,13 @@ import net.kyori.adventure.util.Ticks;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.message.NexParser;
 
 public class MessageUtil {
 
     public static void sendCustom(@NotNull CommandSender sender, @NotNull String message) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(NexParser.toPlainText(message));
-            return;
-        }
-        NexParser.toMessage(message).send(sender);
+        MessageUtil.sendMessage(sender, message);
     }
 
     public static void playSound(@NotNull Audience audience, @Nullable Sound.Type soundType) {

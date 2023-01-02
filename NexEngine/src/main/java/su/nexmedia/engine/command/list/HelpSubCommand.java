@@ -43,7 +43,6 @@ public class HelpSubCommand<P extends NexPlugin<P>> extends AbstractCommand<P> {
             if (line.contains(AbstractCommand.PLACEHOLDER_LABEL)) {
                 for (AbstractCommand<P> cmd : this.parent.getChildrens()) {
                     if (!cmd.hasPermission(sender)) continue;
-
                     MessageUtil.sendMessage(sender, cmd.replacePlaceholders().apply(line));
                 }
                 continue;

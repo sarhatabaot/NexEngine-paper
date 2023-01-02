@@ -1,6 +1,8 @@
 package su.nexmedia.engine.api.menu;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.format.TextDecorationAndState;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -90,7 +92,8 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
             case CLOSE -> player.closeInventory();
             case PAGE_NEXT -> this.open(player, Math.min(pageMax, this.getPage(player) + 1));
             case PAGE_PREVIOUS -> this.open(player, Math.max(1, this.getPage(player) - 1));
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -167,7 +170,22 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
         }
     }
 
+    @SuppressWarnings("DataFlowIssue")
     public void onItemPrepare(@NotNull Player player, @NotNull MenuItem menuItem, @NotNull ItemStack item) {
+        // Minecraft shows the displayName & lore with ITALIC by default.
+        // We remove the ITALIC style, leaving it to the end-users to decide.
+        item.editMeta(meta -> {
+            TextDecorationAndState noItalic = TextDecoration.ITALIC.withState(false);
+            if (meta.hasDisplayName()) {
+                Component modified = meta.displayName().applyFallbackStyle(noItalic);
+                meta.displayName(modified);
+            }
+            if (meta.hasLore()) {
+                List<Component> modified = meta.lore().stream().map(line -> line.applyFallbackStyle(noItalic)).toList();
+                meta.lore(modified);
+            }
+        });
+
         ItemUtil.setPlaceholderAPI(item, player);
     }
 
@@ -219,15 +237,17 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     @Nullable
     public MenuItem getItem(int slot) {
         return this.getItemsMap().values().stream()
-            .filter(item -> ArrayUtils.contains(item.getSlots(), slot))
-            .max(Comparator.comparingInt(MenuItem::getPriority)).orElse(null);
+                   .filter(item -> ArrayUtils.contains(item.getSlots(), slot))
+                   .max(Comparator.comparingInt(MenuItem::getPriority))
+                   .orElse(null);
     }
 
     @Nullable
     public MenuItem getItem(@NotNull Player player, int slot) {
         return this.getUserItems(player).stream()
-            .filter(item -> ArrayUtils.contains(item.getSlots(), slot))
-            .max(Comparator.comparingInt(MenuItem::getPriority)).orElse(this.getItem(slot));
+                   .filter(item -> ArrayUtils.contains(item.getSlots(), slot))
+                   .max(Comparator.comparingInt(MenuItem::getPriority))
+                   .orElse(this.getItem(slot));
     }
 
     public void addItem(@NotNull ItemStack item, int... slots) {

@@ -12,27 +12,30 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public interface EditorButtonType {
 
-    String PREFIX_INFO = "<gold><b>[?] Description:";
-    String PREFIX_NOTE = "<yellow><b>[!] Note:";
-    String PREFIX_WARN = "<red><b>[!] Warning:";
-    String PREFIX_CLICK = "<#55e13><b>[>] Actions:";
+    String PREFIX_INFO    = "<gold><b>[?] Description:";
+    String PREFIX_NOTE    = "<yellow><b>[!] Note:";
+    String PREFIX_WARN    = "<red><b>[!] Warning:";
+    String PREFIX_CLICK   = "<#55e13><b>[>] Actions:";
     String PREFIX_CURRENT = "<aqua><b>[?] Current:";
 
-    @NotNull Material getMaterial();
+    @NotNull
+    Material getMaterial();
 
-    @NotNull String name();
+    @NotNull
+    String name();
 
     void setName(@NotNull Component name);
 
-    @NotNull Component getName();
+    @NotNull
+    Component getName();
 
     void setLore(@NotNull List<Component> lore);
 
-    @NotNull List<Component> getLore();
+    @NotNull
+    List<Component> getLore();
 
     static @NotNull String current(@NotNull String miniMessage) {
         return formatted(miniMessage, PREFIX_CURRENT, "<green>");
@@ -63,16 +66,18 @@ public interface EditorButtonType {
 
     static @NotNull List<String> fineLore(@NotNull String... lore) {
         List<String> newLore = new ArrayList<>();
-        Stream.of(lore).map(str -> str.split("\n")).forEach(arr -> {
-            if (!newLore.isEmpty()) newLore.add(" ");
-            newLore.addAll(Arrays.asList(arr));
-        });
+        Arrays.stream(lore)
+              .map(str -> str.split("\n"))
+              .forEach(arr -> {
+                  if (!newLore.isEmpty()) newLore.add("");
+                  newLore.addAll(Arrays.asList(arr));
+              });
         return newLore;
     }
 
     /**
-     * Transforms the text into multiple segments which are separated with {@code <br>} tag so that it can fit in
-     * an item lore description and avoid the text reaching out of screen.
+     * Transforms the text into multiple segments which are separated with {@code <br>} tag so that it can fit in an
+     * item lore description and avoid the text reaching out of screen.
      *
      * @param miniMessage a string in MiniMessage format
      *
@@ -88,10 +93,13 @@ public interface EditorButtonType {
         if (meta == null) return item;
 
         meta.displayName(this.getName()
-                             .color(NamedTextColor.YELLOW)
-                             .decorate(TextDecoration.BOLD)
+                             .style(config -> {
+                                 config.color(NamedTextColor.YELLOW);
+                                 config.decorate(TextDecoration.BOLD);
+                             })
         );
         meta.lore(this.getLore());
+
         meta.addItemFlags(ItemFlag.values());
         item.setItemMeta(meta);
 
