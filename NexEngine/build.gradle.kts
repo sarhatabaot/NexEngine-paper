@@ -36,10 +36,11 @@ dependencies {
         exclude("org.bukkit")
     }
     compileOnly("net.citizensnpcs:citizensapi:2.0.29-SNAPSHOT")
+    compileOnly("org.geysermc.floodgate:api:2.2.0-SNAPSHOT")
     compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
     compileOnly("io.lumine:Mythic-Dist:5.2.0")
-    compileOnly("io.lumine:MythicLib-dist:1.3.4-SNAPSHOT")
-    compileOnly("net.Indyuce:MMOItems-API:6.8.3-SNAPSHOT")
+    compileOnly("io.lumine:MythicLib-dist:1.5.1-SNAPSHOT")
+    compileOnly("net.Indyuce:MMOItems-API:6.9.1-SNAPSHOT")
     compileOnly("net.leonardo_dgs:InteractiveBooks:1.6.3")
     compileOnly("com.github.DieReicheErethons:Brewery:3.1.1")
     compileOnly("me.clip:placeholderapi:2.10.10")

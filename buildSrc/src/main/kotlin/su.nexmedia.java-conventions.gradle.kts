@@ -29,7 +29,7 @@ repositories {
             includeGroup("com.github.MilkBowl")
         }
     }
-    maven("https://nexus.phoenixdvpt.fr/repository/maven-public/") {
+    maven("https://nexus.phoenixdevt.fr/repository/maven-public/") {
         content{
             includeGroup("io.lumine")
             includeGroup("net.Indyuce")
@@ -56,6 +56,11 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") {
         content {
             includeGroup("me.clip")
+        }
+    }
+    maven("https://repo.opencollab.dev/maven-snapshots/") {
+        content {
+            includeGroup("org.geysermc.floodgate")
         }
     }
 }

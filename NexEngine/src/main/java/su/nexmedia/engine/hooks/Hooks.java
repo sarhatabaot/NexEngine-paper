@@ -26,6 +26,7 @@ public class Hooks {
     public static final String PLACEHOLDER_API   = "PlaceholderAPI";
     public static final String MYTHIC_MOBS       = "MythicMobs";
     public static final String WORLD_GUARD       = "WorldGuard";
+    public static final String FLOODGATE         = "floodgate";
     public static final String BREWERY           = "Brewery";
     public static final String INTERACTIVE_BOOKS = "InteractiveBooks";
     public static final String ITEMS_ADDER       = "ItemsAdder";
@@ -113,6 +114,10 @@ public class Hooks {
 
     public static boolean hasWorldGuard() {
         return hasPlugin(WORLD_GUARD);
+    }
+
+    public static boolean hasFloodgate() {
+        return hasPlugin(FLOODGATE);
     }
 
     public static boolean hasBrewery() {
