@@ -10,6 +10,7 @@ plugins {
 repositories {
     mavenLocal {
         content {
+            includeGroup("net.Indyuce")
             includeGroup("net.leonardo_dgs")
             includeGroup("com.github.DieReicheErethons")
         }
@@ -32,7 +33,6 @@ repositories {
     maven("https://nexus.phoenixdevt.fr/repository/maven-public/") {
         content{
             includeGroup("io.lumine")
-            includeGroup("net.Indyuce")
         }
     }
     maven("https://mvn.lumine.io/repository/maven-public/") {
