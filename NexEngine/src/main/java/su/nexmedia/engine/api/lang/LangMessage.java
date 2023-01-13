@@ -14,7 +14,6 @@ import su.nexmedia.engine.utils.message.NexParser;
 import su.nexmedia.engine.utils.regex.RegexUtil;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,7 +52,7 @@ public class LangMessage {
 
     private final NexPlugin<?> plugin;
 
-    /* All the text data are stored as MiniMessage format */
+    /* All the text data are stored as MiniMessage string */
     private String msgRaw;
     private String msgLocalized;
 
@@ -226,12 +225,12 @@ public class LangMessage {
     public @NotNull List<String> asList() {
         if (this.isEmpty()) return Collections.emptyList();
         return Stream.of(this.getLocalized().split("\\\\n"))
-                     .filter(Predicate.not(String::isEmpty))
+//                     .filter(Predicate.not(String::isEmpty)) // leave it to the caller to deal with
                      .toList();
     }
 
     /**
-     * Replaces a raw '\n' new line splitter with a system one.
+     * Replaces a literal '\n' newline splitter with a system one.
      *
      * @return A string with a system new line splitters.
      */
