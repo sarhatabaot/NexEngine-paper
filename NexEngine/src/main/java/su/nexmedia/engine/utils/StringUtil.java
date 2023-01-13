@@ -8,6 +8,7 @@ import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.utils.random.Rnd;
 
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,13 +66,13 @@ public class StringUtil {
 
     public static @NotNull Color parseColor(@NotNull String colorRaw) {
         String[] rgb = colorRaw.split(",");
-        int red = StringUtil.getInteger(rgb[0], 0);
+        int red = getInteger(rgb[0], 0);
         if (red < 0) red = Rnd.get(255);
 
-        int green = rgb.length >= 2 ? StringUtil.getInteger(rgb[1], 0) : 0;
+        int green = rgb.length >= 2 ? getInteger(rgb[1], 0) : 0;
         if (green < 0) green = Rnd.get(255);
 
-        int blue = rgb.length >= 3 ? StringUtil.getInteger(rgb[2], 0) : 0;
+        int blue = rgb.length >= 3 ? getInteger(rgb[2], 0) : 0;
         if (blue < 0) blue = Rnd.get(255);
 
         return Color.fromRGB(red, green, blue);
@@ -101,21 +102,34 @@ public class StringUtil {
 
     @Deprecated
     public static @NotNull Set<String> color(@NotNull Set<String> list) {
-        return new HashSet<>(StringUtil.color(new ArrayList<>(list)));
+        return new HashSet<>(color(new ArrayList<>(list)));
     }
 
-    public static @NotNull List<String> replace(@NotNull List<String> original, @NotNull String placeholder, boolean keep, String... replacer) {
-        return StringUtil.replace(original, placeholder, keep, Arrays.asList(replacer));
+    /**
+     * @see #replace(List, String, boolean, List)
+     */
+    public static @NotNull List<String> replace(@NotNull List<String> oldList, @NotNull String placeholder, boolean keep, @NotNull String... replacer) {
+        return replace(oldList, placeholder, keep, Arrays.asList(replacer));
     }
 
-    public static @NotNull List<String> replace(@NotNull List<String> original, @NotNull String placeholder, boolean keep, List<String> replacer) {
+
+    /**
+     * Modifies the list of strings such that the new list has the given placeholder replaced by the given replacer.
+     *
+     * @param oldList     the list of strings to which the replacement is applied
+     * @param placeholder the placeholder contained in the list of strings
+     * @param keep        true to keep other contents around the placeholder
+     * @param replacer    the new list of strings replacing the placeholder
+     *
+     * @return a modified copy of the list
+     */
+    public static @NotNull List<String> replace(@NotNull List<String> oldList, @NotNull String placeholder, boolean keep, @NotNull List<String> replacer) {
         List<String> replaced = new ArrayList<>();
-        for (String line : original) {
+        for (String line : oldList) {
             if (line.contains(placeholder)) {
                 if (!keep) {
                     replaced.addAll(replacer);
-                }
-                else {
+                } else {
                     for (String lineReplaced : replacer) {
                         replaced.add(line.replace(placeholder, lineReplaced));
                     }
@@ -126,6 +140,52 @@ public class StringUtil {
         }
 
         return replaced;
+    }
+
+    @SafeVarargs
+    public static @NotNull List<String> replace(@NotNull List<String> oldList, @NotNull UnaryOperator<String>... replacer) {
+        return replace(false, oldList, replacer);
+    }
+
+    @SafeVarargs
+    public static @NotNull List<String> replace(boolean unfoldNewline, @NotNull List<String> oldList, @NotNull UnaryOperator<String>... replacer) {
+        List<String> newList = new ArrayList<>(oldList);
+        for (UnaryOperator<String> re : replacer) {
+            newList.replaceAll(re);
+        }
+        if (unfoldNewline) {
+            newList = fineLore(newList);
+        }
+        return newList;
+    }
+
+    @SafeVarargs
+    public static @NotNull String replace(@NotNull String oldStr, @NotNull UnaryOperator<String>... replacer) {
+        String newStr = null;
+        for (UnaryOperator<String> re : replacer) {
+            newStr = re.apply(oldStr);
+        }
+        return newStr != null ? newStr : oldStr;
+    }
+
+    public static @NotNull List<String> fineLore(@NotNull List<String> lore) {
+        List<String> newList = new ArrayList<>();
+        for (String str : lore) {
+            String[] arr = str.split("\n");
+            if (!newList.isEmpty()) {
+                newList.add("");
+            }
+            if (arr.length > 1) {
+                newList.addAll(Arrays.asList(arr));
+            } else { // for better performance
+                newList.add(str);
+            }
+        }
+        return newList;
+    }
+
+    public static @NotNull List<String> fineLore(@NotNull String... lore) {
+        return fineLore(Arrays.asList(lore));
     }
 
     public static double getDouble(@NotNull String input, double def) {
@@ -181,12 +241,10 @@ public class StringUtil {
                 if (Character.isWhitespace(ch)) {
                     buffer.append(ch);
                     capitalizeNext = true;
-                }
-                else if (capitalizeNext) {
+                } else if (capitalizeNext) {
                     buffer.append(Character.toTitleCase(ch));
                     capitalizeNext = false;
-                }
-                else {
+                } else {
                     buffer.append(ch);
                 }
             }
@@ -244,7 +302,7 @@ public class StringUtil {
     }
 
     public static @NotNull String extractCommandName(@NotNull String cmd) {
-        String cmdFull = StringUtil.asPlainText(cmd).split(" ")[0];
+        String cmdFull = asPlainText(cmd).split(" ")[0];
         String cmdName = cmdFull.replace("/", "").replace("\\/", "");
         String[] pluginPrefix = cmdName.split(":");
         if (pluginPrefix.length == 2) {
@@ -283,8 +341,7 @@ public class StringUtil {
                 min = Character.getNumericValue('A');
                 max = Character.getNumericValue('Z');
                 cas = 'q';
-            }
-            else {
+            } else {
                 min = Character.getNumericValue('a');
                 max = Character.getNumericValue('z');
                 cas = 'p';
@@ -313,8 +370,7 @@ public class StringUtil {
             if (upper) {
                 min = Character.getNumericValue('A');
                 max = Character.getNumericValue('Z');
-            }
-            else {
+            } else {
                 min = Character.getNumericValue('a');
                 max = Character.getNumericValue('z');
             }

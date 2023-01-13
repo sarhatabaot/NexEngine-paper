@@ -14,45 +14,87 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ComponentUtil {
 
+    /**
+     * Converts the MiniMessage string into a component.
+     *
+     * @param miniMessage a MiniMessage string
+     *
+     * @return a component
+     */
     @Contract(pure = true)
     public static @NotNull Component asComponent(@NotNull String miniMessage) {
         return MiniMessage.miniMessage().deserialize(miniMessage);
     }
 
+    /**
+     * Converts the list of MiniMessage strings into a list of components.
+     *
+     * @param miniMessage a list of a MiniMessage strings
+     *
+     * @return a list of components
+     */
     @Contract(pure = true)
     public static @NotNull List<Component> asComponent(@NotNull List<String> miniMessage) {
-        return miniMessage.stream().map(ComponentUtil::asComponent).collect(Collectors.toList());
+        return miniMessage.stream().map(ComponentUtil::asComponent).toList();
     }
 
+    /**
+     * Converts the component into a MiniMessage string.
+     *
+     * @param component a component
+     *
+     * @return a string in MiniMessage representation
+     */
     @Contract(pure = true)
     public static @NotNull String asMiniMessage(@NotNull Component component) {
         return MiniMessage.miniMessage().serialize(component.compact());
     }
 
+    /**
+     * Converts the list of components into a list of MiniMessage strings.
+     *
+     * @param component a list of components
+     *
+     * @return a list of strings in MiniMessage representation
+     */
     @Contract(pure = true)
     public static @NotNull List<String> asMiniMessage(@NotNull List<Component> component) {
-        return component.stream().map(ComponentUtil::asMiniMessage).collect(Collectors.toList());
+        return component.stream().map(ComponentUtil::asMiniMessage).toList();
     }
 
+    /**
+     * Converts the component into a plain text, without any text decorations.
+     *
+     * @param component a component
+     *
+     * @return a plain text
+     */
     @Contract(pure = true)
     public static @NotNull String asPlainText(@NotNull Component component) {
         return PlainTextComponentSerializer.plainText().serialize(component);
     }
 
+    /**
+     * Removes consecutive "empty components" in a list, leaving only a single empty component for any group of
+     * consecutive "empty components" found. "Empty components" are those where the plain content string is
+     * <code>""</code>.
+     *
+     * @param componentList a list of components which may contain empty lines
+     *
+     * @return a modified copy of the list
+     */
     @Contract(pure = true)
-    public static @NotNull List<Component> stripEmpty(@NotNull List<Component> original) {
+    public static @NotNull List<Component> stripEmpty(@NotNull List<Component> componentList) {
         List<Component> stripped = new ArrayList<>();
-        for (int index = 0; index < original.size(); index++) {
-            Component originLine = original.get(index);
-            String plainLine = ComponentUtil.asPlainText(originLine);
+        for (int index = 0; index < componentList.size(); index++) {
+            Component originLine = componentList.get(index);
+            String plainLine = asPlainText(originLine);
             if (plainLine.isEmpty()) {
-                String last = stripped.isEmpty() ? null : ComponentUtil.asPlainText(stripped.get(stripped.size() - 1));
-                if (last == null || last.isEmpty() || index == (original.size() - 1)) continue;
+                String last = stripped.isEmpty() ? null : asPlainText(stripped.get(stripped.size() - 1));
+                if (last == null || last.isEmpty() || index == (componentList.size() - 1)) continue;
             }
             stripped.add(originLine);
         }
@@ -82,13 +124,12 @@ public class ComponentUtil {
     @Contract(pure = true)
     public static Component setPlaceholderAPI(@NotNull Player player, @NotNull Component component) {
         if (!Hooks.hasPlaceholderAPI()) return component;
-        Pattern pattern = PlaceholderAPI.getPlaceholderPattern();
         return component.replaceText(config -> config
-            .match(pattern)
+            .match(PlaceholderAPI.getPlaceholderPattern())
             .replacement((matchResult, builder) -> {
                 String matched = matchResult.group();
                 String replaced = PlaceholderAPI.setPlaceholders(player, matched);
-                return ComponentUtil.asComponent(replaced);
+                return asComponent(replaced);
             })
         );
     }
@@ -121,64 +162,56 @@ public class ComponentUtil {
             .replacement((matchResult, builder) -> {
                 String matched = matchResult.group();
                 String replaced = replacer.apply(matched);
-                return ComponentUtil.asComponent(replaced);
+                return asComponent(replaced);
             })
         );
     }
 
     /**
-     * Applies the string replacer to given component list.
+     * Applies the string replacer to each component of the list.
      *
-     * @param replacer  a string replacer
-     * @param component a component list which the string replacer applies to
+     * @param replacer      a string replacer
+     * @param componentList a list of components which the string replacer applies to
      *
      * @return a modified copy of the list
      */
     @Contract(pure = true)
-    public static @NotNull List<Component> replace(@NotNull List<Component> component, @NotNull UnaryOperator<String> replacer) {
+    public static @NotNull List<Component> replace(@NotNull List<Component> componentList, @NotNull UnaryOperator<String> replacer) {
         List<Component> replaced = new ArrayList<>();
-        for (Component line : component) {
+        for (Component line : componentList) {
             replaced.add(replace(line, replacer));
         }
         return replaced;
     }
 
     /**
-     * Modifies the list of components such that the new list has the given placeholder replaced by the given replacer.
-     *
-     * @param original    the original list of components to which the replacement is applied
-     * @param placeholder the placeholder contained in the list of components
-     * @param keep        true to keep other contents around the placeholder
-     * @param replacer    the new component replacing the placeholder
-     *
-     * @return a modified copy of the list
+     * @see #replace(List, String, boolean, List)
      */
     @Contract(pure = true)
     public static @NotNull List<Component> replace(@NotNull List<Component> original, @NotNull String placeholder, boolean keep, Component... replacer) {
-        return ComponentUtil.replace(original, placeholder, keep, Arrays.asList(replacer));
+        return replace(original, placeholder, keep, Arrays.asList(replacer));
     }
 
     /**
      * Modifies the list of components such that the new list has the given placeholder replaced by the given replacer.
      *
-     * @param original    the original list of components to which the replacement is applied
+     * @param oldList     the list of components to which the replacement is applied
      * @param placeholder the placeholder contained in the list of components
      * @param keep        true to keep other contents around the placeholder
-     * @param replacer    the new component replacing the placeholder
+     * @param replacer    the new list of components replacing the placeholder
      *
      * @return a modified copy of the list
      */
     @Contract(pure = true)
-    public static @NotNull List<Component> replace(@NotNull List<Component> original, @NotNull String placeholder, boolean keep, List<Component> replacer) {
+    public static @NotNull List<Component> replace(@NotNull List<Component> oldList, @NotNull String placeholder, boolean keep, List<Component> replacer) {
         List<Component> replaced = new ArrayList<>();
-        for (Component line : original) {
-            if (ComponentUtil.asPlainText(line).contains(placeholder)) {
+        for (Component oldLine : oldList) {
+            if (asPlainText(oldLine).contains(placeholder)) {
                 if (!keep) {
                     replaced.addAll(replacer);
-                }
-                else {
+                } else {
                     for (Component lineReplaced : replacer) {
-                        replaced.add(line.replaceText(config -> {
+                        replaced.add(oldLine.replaceText(config -> {
                             config.matchLiteral(placeholder);
                             config.replacement(lineReplaced);
                         }));
@@ -186,7 +219,7 @@ public class ComponentUtil {
                 }
                 continue;
             }
-            replaced.add(line);
+            replaced.add(oldLine);
         }
 
         return replaced;

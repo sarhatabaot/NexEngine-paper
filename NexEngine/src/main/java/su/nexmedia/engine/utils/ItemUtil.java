@@ -17,7 +17,6 @@ import su.nexmedia.engine.hooks.Hooks;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 public class ItemUtil {
 
@@ -30,8 +29,7 @@ public class ItemUtil {
     public static int addToLore(@NotNull List<String> lore, int pos, @NotNull String value) {
         if (pos >= lore.size() || pos < 0) {
             lore.add(value);
-        }
-        else {
+        } else {
             lore.add(pos, value);
         }
         return pos < 0 ? pos : pos + 1;
@@ -40,7 +38,8 @@ public class ItemUtil {
     @NotNull
     public static Component getItemName(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return (meta == null || !meta.hasDisplayName()) ? Component.translatable(item.getType()) : Objects.requireNonNull(meta.displayName());
+        return (meta == null || !meta.hasDisplayName()) ? Component.translatable(item.getType())
+                                                        : Objects.requireNonNull(meta.displayName());
     }
 
     @NotNull
@@ -59,8 +58,7 @@ public class ItemUtil {
         Method method = Reflex.getMethod(meta.getClass(), "setProfile", GameProfile.class);
         if (method != null) {
             Reflex.invokeMethod(method, meta, profile);
-        }
-        else {
+        } else {
             Reflex.setFieldValue(meta, "profile", profile);
         }
 
@@ -99,44 +97,82 @@ public class ItemUtil {
             // Replace lore
             if (meta.hasLore()) {
                 List<Component> original = Objects.requireNonNull(meta.lore());
-                List<Component> replaced = original.stream().map(c -> ComponentUtil.setPlaceholderAPI(player, c)).collect(Collectors.toList());
+                List<Component> replaced = original.stream().map(c -> ComponentUtil.setPlaceholderAPI(player, c)).toList();
                 meta.lore(replaced);
             }
         });
     }
 
-    public static void replace(@NotNull ItemStack item, @NotNull UnaryOperator<String> replacer) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
+    /**
+     * Applies the string replacer to the display name and lore of the item meta.
+     * <p>
+     * Note that this method does not handle the "newline" character in the string replacer.
+     *
+     * @param meta     an item meta which the replacer applies to
+     * @param replacer a string replacer
+     *
+     * @see #replaceNameAndLore(boolean, ItemMeta, UnaryOperator[])
+     */
+    @SafeVarargs
+    public static void replaceNameAndLore(@Nullable ItemMeta meta, @NotNull UnaryOperator<String>... replacer) {
+        if (replacer.length == 0) return;
+        replaceNameAndLore(false, meta, replacer);
+    }
+
+    /**
+     * Applies the string replacer to the display name and lore of the item meta.
+     *
+     * @param unfoldNewline true to unfold newline for the item lore
+     * @param meta          the item meta to be modified
+     * @param replacer      a string replacer
+     */
+    @SafeVarargs
+    public static void replaceNameAndLore(boolean unfoldNewline, @Nullable ItemMeta meta, @NotNull UnaryOperator<String>... replacer) {
+        if (meta == null || replacer.length == 0) return;
 
         // Replace item name
-        Component oldName = meta.displayName();
-        if (oldName != null) {
-            Component newName = ComponentUtil.replace(oldName, replacer);
+        Component oldName;
+        Component newName = null;
+        if ((oldName = meta.displayName()) != null) {
+            for (UnaryOperator<String> r : replacer) {
+                newName = ComponentUtil.replace(oldName, r);
+            }
             meta.displayName(newName);
         }
 
         // Replace item lore
-        List<Component> oldLore = meta.lore();
-        List<Component> newLore;
-        if (oldLore != null) {
-            newLore = ComponentUtil.replace(oldLore, replacer);
+        List<Component> oldLore;
+        List<Component> newLore = null;
+        if ((oldLore = meta.lore()) != null) {
+            for (UnaryOperator<String> r : replacer) {
+                newLore = ComponentUtil.replace(oldLore, r);
+            }
+            if (unfoldNewline) {
+                List<String> str$newLore = ComponentUtil.asMiniMessage(newLore);
+                str$newLore = StringUtil.fineLore(str$newLore);
+                newLore = ComponentUtil.asComponent(str$newLore);
+            }
             meta.lore(ComponentUtil.stripEmpty(newLore));
         }
-
-        item.setItemMeta(meta);
     }
 
-    public static void replaceLore(@NotNull ItemStack item, @NotNull String placeholder, @NotNull List<String> replacer) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
-
-        List<Component> oldLore = meta.lore();
-        if (oldLore == null) return;
-
-        List<Component> newLore = ComponentUtil.replace(oldLore, placeholder, false, ComponentUtil.asComponent(replacer));
+    /**
+     * Modifies the item meta such that the given placeholder in the item lore is replaced with the given list of
+     * strings. Note that the replaced lore will span multiple lines of the lore, starting at the given placeholder, if
+     * the replacer contains more than one string.
+     *
+     * @param meta        the item meta to be modified
+     * @param placeholder the placeholder in the item lore to be replaced
+     * @param replacer    the list of stings that will replace the given placeholder
+     *
+     * @see StringUtil#replace(List, String, boolean, List)
+     */
+    public static void replaceSpanLore(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer) {
+        List<Component> oldLore;
+        List<Component> newLore;
+        if (meta == null || (oldLore = meta.lore()) == null) return;
+        newLore = ComponentUtil.replace(oldLore, placeholder, false, ComponentUtil.asComponent(replacer));
         meta.lore(ComponentUtil.stripEmpty(newLore));
-        item.setItemMeta(meta);
     }
 
     public static boolean isWeapon(@NotNull ItemStack item) {
