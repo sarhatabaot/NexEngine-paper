@@ -1,108 +1,114 @@
 package su.nexmedia.engine.api.editor;
 
-import net.kyori.adventure.text.Component;
+import com.google.common.collect.Lists;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.utils.ComponentUtil;
+import su.nexmedia.engine.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public interface EditorButtonType {
 
-    String PREFIX_INFO    = "<gold><b>[?] Description:";
-    String PREFIX_NOTE    = "<yellow><b>[!] Note:";
-    String PREFIX_WARN    = "<red><b>[!] Warning:";
-    String PREFIX_CLICK   = "<#55e13><b>[>] Actions:";
+    String PREFIX_INFO = "<gold><b>[?] Description:";
+    String PREFIX_NOTE = "<yellow><b>[!] Note:";
+    String PREFIX_WARN = "<red><b>[!] Warning:";
+    String PREFIX_CLICK = "<#55e13><b>[>] Actions:";
     String PREFIX_CURRENT = "<aqua><b>[?] Current:";
 
     @NotNull
     Material getMaterial();
 
+    /**
+     * @inheritDoc
+     */
     @NotNull
     String name();
 
-    void setName(@NotNull Component name);
+    /**
+     * @param name a MiniMessage string
+     */
+    void setName(@NotNull String name);
 
+    /**
+     * @return a MiniMessage string
+     */
     @NotNull
-    Component getName();
+    String getName();
 
-    void setLore(@NotNull List<Component> lore);
+    /**
+     * @param lore a list of MiniMessage strings
+     */
+    void setLore(@NotNull List<String> lore);
 
+    /**
+     * @return a list of MiniMessage string
+     */
     @NotNull
-    List<Component> getLore();
+    List<String> getLore();
 
-    static @NotNull String current(@NotNull String miniMessage) {
-        return formatted(miniMessage, PREFIX_CURRENT, "<green>");
+    static @NotNull String current(@NotNull String text) {
+        return formatted(text, PREFIX_CURRENT, "<green>");
     }
 
-    static @NotNull String info(@NotNull String miniMessage) {
-        return formatted(split(miniMessage), PREFIX_INFO, "<gray>");
+    static @NotNull String info(@NotNull String text) {
+        return formatted(split(text), PREFIX_INFO, "<gray>");
     }
 
-    static @NotNull String warn(@NotNull String miniMessage) {
-        return formatted(split(miniMessage), PREFIX_WARN, "<#c70039>"); // kinda red
+    static @NotNull String warn(@NotNull String text) {
+        return formatted(split(text), PREFIX_WARN, "<#c70039>"); // kinda red
     }
 
-    static @NotNull String note(@NotNull String miniMessage) {
-        return formatted(split(miniMessage), PREFIX_NOTE, "<#ffc300>"); // kinda yellow
+    static @NotNull String note(@NotNull String text) {
+        return formatted(split(text), PREFIX_NOTE, "<#ffc300>"); // kinda yellow
     }
 
-    static @NotNull String click(@NotNull String miniMessage) {
-        return formatted(miniMessage, PREFIX_CLICK, "<#86de2a>"); // kinda green
+    static @NotNull String click(@NotNull String text) {
+        return formatted(text, PREFIX_CLICK, "<#86de2a>"); // kinda green
     }
 
     static @NotNull String formatted(@NotNull String text, @NotNull String prefix, @NotNull String color) {
-        List<String> list = new ArrayList<>(Arrays.asList(text.split("\n")));
+        List<String> list = Lists.newArrayList(text.split("\n"));
         list.replaceAll(line -> color + line);
         list.add(0, prefix);
         return String.join("\n", list);
     }
 
     static @NotNull List<String> fineLore(@NotNull String... lore) {
-        List<String> newLore = new ArrayList<>();
-        Arrays.stream(lore)
-              .map(str -> str.split("\n"))
-              .forEach(arr -> {
-                  if (!newLore.isEmpty()) newLore.add("");
-                  newLore.addAll(Arrays.asList(arr));
-              });
-        return newLore;
+        return StringUtil.fineLore(lore);
     }
 
     /**
-     * Transforms the text into multiple segments which are separated with {@code <br>} tag so that it can fit in an
-     * item lore description and avoid the text reaching out of screen.
+     * Transforms the text into multiple segments (of length <= 5 words) which are separated with a <code>\n</code>
+     * character.
+     * <p>
+     * It is known that the <code>\n</code> character does not create a newline in the item lore. Instead, it will be
+     * displayed as a "newline" character. You are required to manually split the text into multiple lines and insert
+     * them into the item lore. See {@link #fineLore(String...)}.
      *
-     * @param miniMessage a string in MiniMessage format
+     * @param text a MiniMessage string
      *
      * @return the original miniMessage but the content is separated with {@code <br>} tag
      */
-    static @NotNull String split(@NotNull String miniMessage) {
-        return miniMessage.replaceAll("((?:\\S*\\s){5}\\S*)\\s", "$1\n");
+    static @NotNull String split(@NotNull String text) {
+        return text.replaceAll("((?:\\S*\\s){5}\\S*)\\s", "$1\n");
     }
 
     default @NotNull ItemStack getItem() {
         ItemStack item = new ItemStack(this.getMaterial());
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-
-        meta.displayName(this.getName()
-                             .style(config -> {
-                                 config.color(NamedTextColor.YELLOW);
-                                 config.decorate(TextDecoration.BOLD);
-                             })
-        );
-        meta.lore(this.getLore());
-
-        meta.addItemFlags(ItemFlag.values());
-        item.setItemMeta(meta);
-
+        item.editMeta(meta -> {
+            meta.displayName(ComponentUtil
+                .asComponent(this.getName())
+                .color(NamedTextColor.YELLOW)
+                .decorate(TextDecoration.BOLD)
+            );
+            meta.lore(ComponentUtil.asComponent(this.getLore()));
+            meta.addItemFlags(ItemFlag.values());
+        });
         return item;
     }
 }

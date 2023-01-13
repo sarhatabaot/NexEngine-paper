@@ -1,10 +1,8 @@
 package su.nexmedia.engine.api.menu;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.editor.EditorButtonType;
-import su.nexmedia.engine.utils.ComponentUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,21 +17,15 @@ public enum MenuItemType implements EditorButtonType {
     CONFIRMATION_DECLINE(Material.PINK_DYE, "<red><b>Decline"),
     ;
 
-    private final Material        material;
-    private       Component       name;
-    private       List<Component> lore;
+    private final Material material;
+    private String name;
+    private List<String> lore;
 
     MenuItemType() {
-        this(Material.AIR, Component.empty(), Component.empty());
+        this(Material.AIR, "", "");
     }
 
     MenuItemType(@NotNull Material material, @NotNull String name, @NotNull String... lore) {
-        this.material = material;
-        this.setName(ComponentUtil.asComponent(name));
-        this.setLore(ComponentUtil.asComponent(Arrays.asList(lore)));
-    }
-
-    MenuItemType(@NotNull Material material, @NotNull Component name, @NotNull Component... lore) {
         this.material = material;
         this.setName(name);
         this.setLore(Arrays.asList(lore));
@@ -45,22 +37,22 @@ public enum MenuItemType implements EditorButtonType {
     }
 
     @Override
-    public @NotNull Component getName() {
+    public @NotNull String getName() {
         return this.name;
     }
 
     @Override
-    public void setName(@NotNull Component name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
     @Override
-    public @NotNull List<Component> getLore() {
+    public @NotNull List<String> getLore() {
         return this.lore;
     }
 
     @Override
-    public void setLore(@NotNull List<Component> lore) {
+    public void setLore(@NotNull List<String> lore) {
         this.lore = lore;
     }
 
