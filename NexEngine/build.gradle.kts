@@ -44,7 +44,7 @@ bukkit {
     version = "${project.version}"
     apiVersion = "1.17"
     authors = listOf("NightExpress")
-    softDepend = listOf("Vault", "Brewery", "ItemsAdder", "MMOItems", "MythicLib", "InteractiveBooks")
+    softDepend = listOf("Vault", "Citizens", "Brewery", "ItemsAdder", "MMOItems", "MythicLib", "InteractiveBooks")
     load = STARTUP
     libraries = listOf("com.zaxxer:HikariCP:5.0.1", "it.unimi.dsi:fastutil:8.5.11")
 }
