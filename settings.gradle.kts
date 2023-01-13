@@ -3,12 +3,19 @@
  */
 
 rootProject.name = "NexEnginePlugin"
+
+// The Paper plugin
 include(":NexEngine")
+
+// Code related to random 3rd party plugins
+include(":NexEngineExt")
+
+include(":NMS")
 include(":NexEngineCompat_V1_19_R1")
 include(":NexEngineCompat_V1_19_R2")
 include(":NexEngineCompat_V1_17_R1")
 include(":NexEngineCompat_V1_18_R2")
-include(":NMS")
+
 include(":PlayerBlockTracker")
 
 pluginManagement {

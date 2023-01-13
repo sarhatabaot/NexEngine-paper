@@ -29,21 +29,10 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // 3rd party plugins
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
-        isTransitive = false
+    compileOnly("me.clip:placeholderapi:2.10.10") // PAPI is clean and we can leave it here
+    implementation(project(":NexEngineExt")) {
+        isTransitive = false // exclude random 3rd party plugins
     }
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6") {
-        exclude("org.bukkit")
-    }
-    compileOnly("net.citizensnpcs:citizensapi:2.0.29-SNAPSHOT")
-    compileOnly("org.geysermc.floodgate:api:2.2.0-SNAPSHOT")
-    compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
-    compileOnly("io.lumine:Mythic-Dist:5.2.0")
-    compileOnly("io.lumine:MythicLib-dist:1.5.1-SNAPSHOT")
-    compileOnly("net.Indyuce:MMOItems-API:6.9.1-SNAPSHOT")
-    compileOnly("net.leonardo_dgs:InteractiveBooks:1.6.3")
-    compileOnly("com.github.DieReicheErethons:Brewery:3.1.1")
-    compileOnly("me.clip:placeholderapi:2.10.10")
 }
 
 description = "NexEngine"
