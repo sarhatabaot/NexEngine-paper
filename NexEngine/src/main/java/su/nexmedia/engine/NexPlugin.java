@@ -19,7 +19,7 @@ import su.nexmedia.engine.command.CommandManager;
 import su.nexmedia.engine.command.PluginMainCommand;
 import su.nexmedia.engine.config.ConfigManager;
 import su.nexmedia.engine.hooks.Hooks;
-import su.nexmedia.engine.hooks.external.citizens.CitizensHook;
+import su.nexmedia.engine.hooks.npc.CitizensHook;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.nms.NMS;
 import su.nexmedia.engine.utils.Reflex;

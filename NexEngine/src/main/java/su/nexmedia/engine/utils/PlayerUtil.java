@@ -1,6 +1,5 @@
 package su.nexmedia.engine.utils;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -8,9 +7,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.geysermc.floodgate.api.FloodgateApi;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.hooks.Hooks;
+import su.nexmedia.engine.hooks.misc.FloodgateHook;
+import su.nexmedia.engine.hooks.misc.PlaceholderHook;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class PlayerUtil {
 
     public static boolean isBedrockPlayer(@NotNull Player player) {
-        return Hooks.hasFloodgate() && FloodgateApi.getInstance().isFloodgatePlayer(player.getUniqueId());
+        return Hooks.hasFloodgate() && FloodgateHook.isFloodgatePlayer(player.getUniqueId());
     }
 
     public static void dispatchCommand(@NotNull Player player, @NotNull String command) {
@@ -31,7 +31,7 @@ public class PlayerUtil {
         command = command.trim().replace("%player%", player.getName());
         command = Placeholders.Player.replacer(player).apply(command);
         if (Hooks.hasPlaceholderAPI()) {
-            command = PlaceholderAPI.setPlaceholders(player, command);
+            command = PlaceholderHook.setPlaceholders(player, command);
         }
         Bukkit.dispatchCommand(sender, command);
     }

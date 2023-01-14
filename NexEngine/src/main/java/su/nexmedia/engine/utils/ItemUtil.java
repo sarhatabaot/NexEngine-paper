@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.config.EngineConfig;
 import su.nexmedia.engine.hooks.Hooks;
+import su.nexmedia.engine.hooks.misc.PlaceholderHook;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -38,8 +39,7 @@ public class ItemUtil {
     @NotNull
     public static Component getItemName(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return (meta == null || !meta.hasDisplayName()) ? Component.translatable(item.getType())
-                                                        : Objects.requireNonNull(meta.displayName());
+        return (meta == null || !meta.hasDisplayName()) ? Component.translatable(item.getType()) : Objects.requireNonNull(meta.displayName());
     }
 
     @NotNull
@@ -83,24 +83,18 @@ public class ItemUtil {
         return opt.map(Property::getValue).orElse(null);
     }
 
-    public static void setPlaceholderAPI(@NotNull ItemStack item, @NotNull Player player) {
+    public static void setPlaceholderAPI(@NotNull ItemMeta meta, @NotNull Player player) {
         if (!Hooks.hasPlaceholderAPI()) return;
-
-        item.editMeta(meta -> {
-            // Replace displayName
-            if (meta.hasDisplayName()) {
-                Component original = Objects.requireNonNull(meta.displayName());
-                Component replaced = ComponentUtil.setPlaceholderAPI(player, original);
-                meta.displayName(replaced);
-            }
-
-            // Replace lore
-            if (meta.hasLore()) {
-                List<Component> original = Objects.requireNonNull(meta.lore());
-                List<Component> replaced = original.stream().map(c -> ComponentUtil.setPlaceholderAPI(player, c)).toList();
-                meta.lore(replaced);
-            }
-        });
+        if (meta.hasDisplayName()) {
+            Component original = Objects.requireNonNull(meta.displayName());
+            Component replaced = PlaceholderHook.setPlaceholders(player, original);
+            meta.displayName(replaced);
+        }
+        if (meta.hasLore()) {
+            List<Component> original = Objects.requireNonNull(meta.lore());
+            List<Component> replaced = original.stream().map(c -> PlaceholderHook.setPlaceholders(player, c)).toList();
+            meta.lore(replaced);
+        }
     }
 
     /**

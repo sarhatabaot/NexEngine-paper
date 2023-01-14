@@ -47,7 +47,7 @@ public abstract class AbstractMenuAuto<P extends NexPlugin<P>, I> extends Abstra
         int count = 0;
         for (I object : list) {
             ItemStack item = this.getObjectStack(player, object);
-            MenuItem menuItem = new MenuItem(item, this.getObjectSlots()[count++]);
+            MenuItem menuItem = new MenuItemImpl(item, this.getObjectSlots()[count++]);
             menuItem.setClickHandler(this.getObjectClick(player, object));
             this.addItem(player, menuItem);
         }

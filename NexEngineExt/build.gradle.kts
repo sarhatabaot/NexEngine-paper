@@ -7,12 +7,14 @@ plugins {
 }
 
 dependencies {
-    compileOnly(project(":NexEngine"))
+    compileOnly(project(":NexEngineAPI"))
+
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // 3rd party plugins
     //   that may contain random transitive dependencies
     //   and shadowed libs that are not properly relocated
+    compileOnly("me.clip:placeholderapi:2.10.10")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
         isTransitive = false
     }

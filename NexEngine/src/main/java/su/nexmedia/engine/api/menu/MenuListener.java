@@ -45,7 +45,10 @@ public class MenuListener<P extends NexPlugin<P>> extends AbstractListener<P> {
         boolean isPlayerSlot = slot >= inventory.getSize();
         boolean isEmptyItem = item == null || item.getType().isAir();
 
-        AbstractMenu.SlotType slotType = isPlayerSlot ? (isEmptyItem ? AbstractMenu.SlotType.EMPTY_PLAYER : AbstractMenu.SlotType.PLAYER) : (isEmptyItem ? AbstractMenu.SlotType.EMPTY_MENU : AbstractMenu.SlotType.MENU);
+        AbstractMenu.SlotType slotType =
+            isPlayerSlot
+            ? (isEmptyItem ? AbstractMenu.SlotType.EMPTY_PLAYER : AbstractMenu.SlotType.PLAYER)
+            : (isEmptyItem ? AbstractMenu.SlotType.EMPTY_MENU : AbstractMenu.SlotType.MENU);
         if (this.menu.cancelClick(e, slotType)) {
             e.setCancelled(true);
         }

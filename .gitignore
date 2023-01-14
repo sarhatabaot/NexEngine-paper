@@ -7,8 +7,12 @@
 
 /buildSrc/build
 
+/NexEngineAPI/build
+
 /NexEngine/build
 /NexEngine/target
+
+/NexEngineExt/build
 
 /NexEngineCompat_V1_17_R1/build
 /NexEngineCompat_V1_17_R1/target

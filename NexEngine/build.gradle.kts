@@ -13,6 +13,8 @@ plugins {
 }
 
 dependencies {
+    api(project(":NexEngineAPI"))
+
     // NMS modules
     api(project(":NMS"))
     runtimeOnly(project(":NexEngineCompat_V1_17_R1", configuration = "reobf"))
@@ -25,11 +27,9 @@ dependencies {
     compileOnly("com.mojang:authlib:3.16.29")
     compileOnly("io.netty:netty-all:4.1.85.Final")
     compileOnly("org.xerial:sqlite-jdbc:3.40.0.0")
-    compileOnly("commons-lang:commons-lang:2.6")
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // 3rd party plugins
-    compileOnly("me.clip:placeholderapi:2.10.10") // PAPI is clean and we can leave it here
     implementation(project(":NexEngineExt")) {
         isTransitive = false // exclude random 3rd party plugins
     }
