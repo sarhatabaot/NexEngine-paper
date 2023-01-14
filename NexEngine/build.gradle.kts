@@ -75,7 +75,6 @@ tasks {
 
     // Copy the output jar to the dev server
     register("deployToServer") {
-        dependsOn(build)
         doLast {
             exec {
                 commandLine("rsync", "${shadowJar.get().archiveFile.path}", "dev:data/dev/jar")
