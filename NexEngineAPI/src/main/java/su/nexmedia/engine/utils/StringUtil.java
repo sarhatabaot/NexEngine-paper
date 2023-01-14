@@ -159,12 +159,11 @@ public class StringUtil {
     }
 
     @SafeVarargs
-    public static @NotNull String replace(@NotNull String oldStr, @NotNull UnaryOperator<String>... replacer) {
-        String newStr = null;
+    public static @NotNull String replace(@NotNull String text, @NotNull UnaryOperator<String>... replacer) {
         for (UnaryOperator<String> re : replacer) {
-            newStr = re.apply(oldStr);
+            text = re.apply(text); // Reassign
         }
-        return newStr != null ? newStr : oldStr;
+        return text;
     }
 
     public static @NotNull List<String> fineLore(@NotNull List<String> lore) {
