@@ -36,16 +36,14 @@ public class ItemUtil {
         return pos < 0 ? pos : pos + 1;
     }
 
-    @NotNull
-    public static Component getItemName(@NotNull ItemStack item) {
+    public static @Nullable Component getName(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return (meta == null || !meta.hasDisplayName()) ? Component.translatable(item.getType()) : Objects.requireNonNull(meta.displayName());
+        return meta != null && meta.hasDisplayName() ? meta.displayName() : null;
     }
 
-    @NotNull
-    public static List<Component> getLore(@NotNull ItemStack item) {
+    public static @Nullable List<Component> getLore(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return (meta == null || !meta.hasLore()) ? new ArrayList<>() : Objects.requireNonNull(meta.lore());
+        return meta != null && meta.hasLore() ? meta.lore() : null;
     }
 
     public static void setSkullTexture(@NotNull ItemStack item, @NotNull String value) {
@@ -125,28 +123,26 @@ public class ItemUtil {
         if (meta == null || replacer.length == 0) return;
 
         // Replace item name
-        Component oldName;
-        Component newName = null;
-        if ((oldName = meta.displayName()) != null) {
+        Component name;
+        if ((name = meta.displayName()) != null) {
             for (UnaryOperator<String> r : replacer) {
-                newName = ComponentUtil.replace(oldName, r);
+                name = ComponentUtil.replace(name, r); // Reassign
             }
-            meta.displayName(newName);
+            meta.displayName(name);
         }
 
         // Replace item lore
-        List<Component> oldLore;
-        List<Component> newLore = null;
-        if ((oldLore = meta.lore()) != null) {
+        List<Component> lore;
+        if ((lore = meta.lore()) != null) {
             for (UnaryOperator<String> r : replacer) {
-                newLore = ComponentUtil.replace(oldLore, r);
+                lore = ComponentUtil.replace(lore, r); // Reassign
             }
             if (unfoldNewline) {
-                List<String> str$newLore = ComponentUtil.asMiniMessage(newLore);
+                List<String> str$newLore = ComponentUtil.asMiniMessage(lore);
                 str$newLore = StringUtil.fineLore(str$newLore);
-                newLore = ComponentUtil.asComponent(str$newLore);
+                lore = ComponentUtil.asComponent(str$newLore);
             }
-            meta.lore(ComponentUtil.stripEmpty(newLore));
+            meta.lore(ComponentUtil.stripEmpty(lore));
         }
     }
 
@@ -162,11 +158,10 @@ public class ItemUtil {
      * @see StringUtil#replace(List, String, boolean, List)
      */
     public static void replaceSpanLore(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer) {
-        List<Component> oldLore;
-        List<Component> newLore;
-        if (meta == null || (oldLore = meta.lore()) == null) return;
-        newLore = ComponentUtil.replace(oldLore, placeholder, false, ComponentUtil.asComponent(replacer));
-        meta.lore(ComponentUtil.stripEmpty(newLore));
+        List<Component> lore;
+        if (meta == null || (lore = meta.lore()) == null) return;
+        lore = ComponentUtil.replace(lore, placeholder, false, ComponentUtil.asComponent(replacer));
+        meta.lore(ComponentUtil.stripEmpty(lore));
     }
 
     public static boolean isWeapon(@NotNull ItemStack item) {
