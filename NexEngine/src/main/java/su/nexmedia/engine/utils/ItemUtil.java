@@ -36,14 +36,14 @@ public class ItemUtil {
         return pos < 0 ? pos : pos + 1;
     }
 
-    public static @Nullable Component getName(@NotNull ItemStack item) {
+    public static @NotNull Component getName(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return meta != null && meta.hasDisplayName() ? meta.displayName() : null;
+        return meta != null && meta.hasDisplayName() ? Objects.requireNonNull(meta.displayName()) : Component.translatable(item.getType());
     }
 
-    public static @Nullable List<Component> getLore(@NotNull ItemStack item) {
+    public static @NotNull List<Component> getLore(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        return meta != null && meta.hasLore() ? meta.lore() : null;
+        return meta != null && meta.hasLore() ? Objects.requireNonNull(meta.lore()) : new ArrayList<>();
     }
 
     public static void setSkullTexture(@NotNull ItemStack item, @NotNull String value) {
