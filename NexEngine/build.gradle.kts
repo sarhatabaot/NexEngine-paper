@@ -30,9 +30,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // 3rd party plugins
-    implementation(project(":NexEngineExt")) {
-        isTransitive = false // exclude random 3rd party plugins
-    }
+    api(project(":NexEngineExt"))
 }
 
 description = "NexEngine"
