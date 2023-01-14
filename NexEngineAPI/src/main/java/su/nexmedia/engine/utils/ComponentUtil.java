@@ -232,12 +232,10 @@ public class ComponentUtil {
     public static List<Component> replacePlaceholderList(@NotNull String placeholder, @Nullable List<Component> dst, @NotNull List<Component> src) {
         if (dst == null) return null;
 
-        // Component is complex. We use plain text to find the pos of the placeholder
-        List<String> dst$plain = dst.stream().map(ComponentUtil::asPlainText).toList();
-
         // Let's find the index of placeholder in dst
         int placeholderIdx = -1;
-        for (int i = 0; i < dst$plain.size(); i++) {
+        for (int i = 0; i < dst.size(); i++) {
+            // Component is complex. We use plain text to find the pos of the placeholder
             if (ComponentUtil.asPlainText(dst.get(i)).contains(placeholder)) {
                 placeholderIdx = i;
                 break;
