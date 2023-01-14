@@ -79,16 +79,15 @@ public interface EditorButtonType {
     }
 
     static @NotNull List<String> fineLore(@NotNull String... lore) {
-        return StringUtil.fineLore(lore);
+        return StringUtil.unfoldByNewline(lore);
     }
 
     /**
-     * Transforms the text into multiple segments (of length <= 5 words) which are separated with a <code>\n</code>
-     * character.
+     * Transforms the text into multiple segments (of length <= 6 words) which are separated with a '\n' character.
      * <p>
-     * It is known that the <code>\n</code> character does not create a newline in the item lore. Instead, it will be
-     * displayed as a "newline" character. You are required to manually split the text into multiple lines and insert
-     * them into the item lore. See {@link #fineLore(String...)}.
+     * It is known that the '\n' character does not create a newline in the item lore. Instead, it will be displayed as
+     * a "newline" character. You are supposed to manually split the text into multiple lines and insert them into the
+     * item lore. The method {@link #fineLore(String...)} may help.
      *
      * @param text a MiniMessage string
      *

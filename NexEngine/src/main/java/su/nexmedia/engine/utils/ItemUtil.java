@@ -125,21 +125,17 @@ public class ItemUtil {
         // Replace item name
         Component name;
         if ((name = meta.displayName()) != null) {
-            for (UnaryOperator<String> r : replacer) {
-                name = ComponentUtil.replace(name, r); // Reassign
-            }
+            name = ComponentUtil.replace(name, replacer); // Reassign
             meta.displayName(name);
         }
 
         // Replace item lore
         List<Component> lore;
         if ((lore = meta.lore()) != null) {
-            for (UnaryOperator<String> r : replacer) {
-                lore = ComponentUtil.replace(lore, r); // Reassign
-            }
+            lore = ComponentUtil.replace(lore, replacer); // Reassign
             if (unfoldNewline) {
                 List<String> str$newLore = ComponentUtil.asMiniMessage(lore);
-                str$newLore = StringUtil.fineLore(str$newLore);
+                str$newLore = StringUtil.unfoldByNewline(str$newLore);
                 lore = ComponentUtil.asComponent(str$newLore);
             }
             meta.lore(ComponentUtil.stripEmpty(lore));
@@ -161,7 +157,8 @@ public class ItemUtil {
         List<Component> lore;
         if (meta == null || (lore = meta.lore()) == null) return;
         lore = ComponentUtil.replace(lore, placeholder, false, ComponentUtil.asComponent(replacer));
-        meta.lore(ComponentUtil.stripEmpty(lore));
+        lore = ComponentUtil.stripEmpty(lore);
+        meta.lore(lore);
     }
 
     public static boolean isWeapon(@NotNull ItemStack item) {

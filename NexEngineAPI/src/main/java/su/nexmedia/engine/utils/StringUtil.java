@@ -3,7 +3,9 @@ package su.nexmedia.engine.utils;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.random.Rnd;
 
 import java.util.*;
@@ -153,7 +155,7 @@ public class StringUtil {
             newList.replaceAll(re);
         }
         if (unfoldNewline) {
-            newList = fineLore(newList);
+            newList = unfoldByNewline(newList);
         }
         return newList;
     }
@@ -166,13 +168,34 @@ public class StringUtil {
         return text;
     }
 
-    public static @NotNull List<String> fineLore(@NotNull List<String> lore) {
+    @Contract("_, null, _ -> null; _, !null, _ -> !null ")
+    public static List<String> replacePlaceholderList(@NotNull String placeholder, @Nullable List<String> dst, @NotNull List<String> src) {
+        if (dst == null) return null;
+
+        // Let's find the index of placeholder in dst
+        int placeholderIdx = -1;
+        for (int i = 0; i < dst.size(); i++) {
+            if (dst.get(i).contains(placeholder)) {
+                placeholderIdx = i;
+                break;
+            }
+        }
+        if (placeholderIdx == -1) return dst;
+
+        // Insert the src into the dst
+        List<String> result = new ArrayList<>(dst);
+        result.remove(placeholderIdx); // Need to remove the raw placeholder from dst
+        result.addAll(placeholderIdx, src);
+        // for (final String line : Lists.reverse(src)) {
+        //     result.add(placeholderIdx, line);
+        // }
+        return result;
+    }
+
+    public static @NotNull List<String> unfoldByNewline(@NotNull List<String> lore) {
         List<String> newList = new ArrayList<>();
         for (String str : lore) {
             String[] arr = str.split("\n");
-            if (!newList.isEmpty()) {
-                newList.add("");
-            }
             if (arr.length > 1) {
                 newList.addAll(Arrays.asList(arr));
             } else { // for better performance
@@ -182,8 +205,19 @@ public class StringUtil {
         return newList;
     }
 
-    public static @NotNull List<String> fineLore(@NotNull String... lore) {
-        return fineLore(Arrays.asList(lore));
+    public static @NotNull List<String> unfoldByNewline(String text) {
+        List<String> unfolded = new ArrayList<>();
+        String[] arr = text.split("\n");
+        if (arr.length > 1) {
+            unfolded.addAll(Arrays.asList(arr));
+        } else { // for better performance
+            unfolded.add(text);
+        }
+        return unfolded;
+    }
+
+    public static @NotNull List<String> unfoldByNewline(@NotNull String... lore) {
+        return unfoldByNewline(Arrays.asList(lore));
     }
 
     public static double getDouble(@NotNull String input, double def) {
