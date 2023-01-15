@@ -204,10 +204,10 @@ public class ComponentUtil {
                     replaced.addAll(replacer);
                 } else {
                     for (Component lineReplaced : replacer) {
-                        replaced.add(oldLine.replaceText(config -> {
-                            config.matchLiteral(placeholder);
-                            config.replacement(lineReplaced);
-                        }));
+                        replaced.add(oldLine.replaceText(config -> config
+                            .matchLiteral(placeholder)
+                            .replacement(lineReplaced)
+                        ));
                     }
                 }
                 continue;
