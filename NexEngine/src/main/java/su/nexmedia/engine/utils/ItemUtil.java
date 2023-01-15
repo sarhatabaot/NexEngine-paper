@@ -98,7 +98,7 @@ public class ItemUtil {
     /**
      * Applies the string replacer to the display name and lore of the item meta.
      * <p>
-     * Note that this method does not handle the "newline" character in the string replacer.
+     * <b>Note that this method does not handle the "newline" character in the string replacer.</b>
      *
      * @param meta     an item meta which the replacer applies to
      * @param replacer a string replacer
@@ -120,39 +120,55 @@ public class ItemUtil {
         List<Component> lore;
         if ((lore = meta.lore()) != null) {
             lore = ComponentUtil.replace(lore, replacer);
-            meta.lore(ComponentUtil.stripEmpty(lore));
+            lore = ComponentUtil.compressEmptyLines(lore);
+            meta.lore(lore);
         }
 
         return name != null || lore != null;
     }
 
     /**
-     * @see #replacePlaceholderListComponent(ItemMeta, String, List)
+     * Modifies the item lore such that the <b>first</b> placeholder found in the lore is replaced with the given list
+     * of strings. Note that the replaced lore will span multiple lines of the lore, starting at the given placeholder,
+     * if the replacer contains more than one string.
+     *
+     * @param meta          the item meta to be modified
+     * @param placeholder   the placeholder in the item lore to be replaced
+     * @param replacer      the list of stings that will replace the given placeholder
+     * @param compressEmpty true to compress empty lines in the lore
+     *
+     * @return true if the item meta changed
+     *
+     * @see ComponentUtil#replacePlaceholderList(String, List, List)
      */
-    public static boolean replacePlaceholderListString(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer) {
-        return replacePlaceholderListComponent(meta, placeholder, ComponentUtil.asComponent(replacer));
+    public static boolean replacePlaceholderListComponent(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<Component> replacer, boolean compressEmpty) {
+        List<Component> lore;
+        if (meta == null || (lore = meta.lore()) == null) return false;
+        lore = ComponentUtil.replacePlaceholderList(placeholder, lore, replacer);
+        if (compressEmpty) lore = ComponentUtil.compressEmptyLines(lore);
+        meta.lore(lore);
+        return true;
     }
 
     /**
-     * Modifies the item meta such that the given placeholder in the item lore is replaced with the given list of
-     * strings. Note that the replaced lore will span multiple lines of the lore, starting at the given placeholder, if
-     * the replacer contains more than one string.
-     *
-     * @param meta        the item meta to be modified
-     * @param placeholder the placeholder in the item lore to be replaced
-     * @param replacer    the list of stings that will replace the given placeholder
-     *
-     * @see StringUtil#replace(List, String, boolean, List)
-     *
-     * @return true if the item meta changed
+     * @see #replacePlaceholderListComponent(ItemMeta, String, List, boolean)
      */
     public static boolean replacePlaceholderListComponent(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<Component> replacer) {
-        List<Component> lore;
-        if (meta == null || (lore = meta.lore()) == null) return false;
-        lore = ComponentUtil.replace(lore, placeholder, false, replacer);
-        lore = ComponentUtil.stripEmpty(lore);
-        meta.lore(lore);
-        return true;
+        return replacePlaceholderListComponent(meta, placeholder, replacer, false);
+    }
+
+    /**
+     * @see #replacePlaceholderListComponent(ItemMeta, String, List, boolean)
+     */
+    public static boolean replacePlaceholderListString(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer, boolean compressEmpty) {
+        return replacePlaceholderListComponent(meta, placeholder, ComponentUtil.asComponent(replacer), compressEmpty);
+    }
+
+    /**
+     * @see #replacePlaceholderListComponent(ItemMeta, String, List, boolean)
+     */
+    public static boolean replacePlaceholderListString(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer) {
+        return replacePlaceholderListComponent(meta, placeholder, ComponentUtil.asComponent(replacer));
     }
 
     public static boolean isWeapon(@NotNull ItemStack item) {

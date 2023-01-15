@@ -88,31 +88,7 @@ public class ComponentUtil {
     }
 
     /**
-     * Removes consecutive "empty components" in a list, leaving only a single empty component for any group of
-     * consecutive "empty components" found. "Empty components" are those where the plain content string is
-     * <code>""</code>.
-     *
-     * @param componentList a list of components which may contain empty lines
-     *
-     * @return a modified copy of the list
-     */
-    @Contract(pure = true)
-    public static @NotNull List<Component> stripEmpty(@NotNull List<Component> componentList) {
-        List<Component> stripped = new ArrayList<>();
-        for (int index = 0; index < componentList.size(); index++) {
-            Component originLine = componentList.get(index);
-            String plainLine = asPlainText(originLine);
-            if (plainLine.isEmpty()) {
-                String last = stripped.isEmpty() ? null : asPlainText(stripped.get(stripped.size() - 1));
-                if (last == null || last.isEmpty() || index == (componentList.size() - 1)) continue;
-            }
-            stripped.add(originLine);
-        }
-        return stripped;
-    }
-
-    /**
-     * Strips all MiniMessage tags from given text.
+     * Removes all MiniMessage tags from given text.
      *
      * @param miniMessage a text in MiniMessage format
      *
@@ -121,6 +97,34 @@ public class ComponentUtil {
     @Contract(pure = true)
     public static @NotNull String stripTags(@NotNull String miniMessage) {
         return MiniMessage.miniMessage().stripTags(miniMessage);
+    }
+
+    /**
+     * Transforms any group of empty components found in a row into just one empty component.
+     * <p>
+     * Empty components are those where the plain content string is "".
+     *
+     * @param componentList a list of components which may contain empty lines
+     *
+     * @return a modified copy of the list
+     */
+    @Contract(pure = true)
+    public static @NotNull List<Component> compressEmptyLines(@NotNull List<Component> componentList) {
+        List<Component> stripped = new ArrayList<>();
+        boolean prevEmpty = false; // Mark whether the previous line is empty
+        for (Component line : componentList) {
+            String plainLine = asPlainText(line);
+            if (plainLine.isEmpty()) {
+                if (!prevEmpty) {
+                    prevEmpty = true;
+                    stripped.add(line);
+                }
+            } else {
+                prevEmpty = false;
+                stripped.add(line);
+            }
+        }
+        return stripped;
     }
 
     @Contract(pure = true)
@@ -178,11 +182,12 @@ public class ComponentUtil {
     }
 
     /**
-     * @see #replace(List, String, boolean, List)
+     * @deprecated in favor of {@link #replacePlaceholderList(String, List, List)}
      */
+    @Deprecated
     @Contract(pure = true)
     public static @NotNull List<Component> replace(@NotNull List<Component> original, @NotNull String placeholder, boolean keep, Component... replacer) {
-        return replace(original, placeholder, keep, Arrays.asList(replacer));
+        return replacePlaceholderList(placeholder, original, Arrays.asList(replacer));
     }
 
     /**
@@ -194,27 +199,13 @@ public class ComponentUtil {
      * @param replacer    the new list of components replacing the placeholder
      *
      * @return a modified copy of the list
+     *
+     * @deprecated in favor of {@link #replacePlaceholderList(String, List, List)}
      */
+    @Deprecated
     @Contract(pure = true)
     public static @NotNull List<Component> replace(@NotNull List<Component> oldList, @NotNull String placeholder, boolean keep, List<Component> replacer) {
-        List<Component> replaced = new ArrayList<>();
-        for (Component oldLine : oldList) {
-            if (asPlainText(oldLine).contains(placeholder)) {
-                if (!keep) {
-                    replaced.addAll(replacer);
-                } else {
-                    for (Component lineReplaced : replacer) {
-                        replaced.add(oldLine.replaceText(config -> config
-                            .matchLiteral(placeholder)
-                            .replacement(lineReplaced)
-                        ));
-                    }
-                }
-                continue;
-            }
-            replaced.add(oldLine);
-        }
-        return replaced;
+        return replacePlaceholderList(placeholder, oldList, replacer);
     }
 
     /**
@@ -228,7 +219,7 @@ public class ComponentUtil {
      *
      * @return a modified copy of the dst list
      */
-    @Contract("_, null, _ -> null; _, !null, _ -> !null ")
+    @Contract(pure = true, value = "_, null, _ -> null; _, !null, _ -> !null ")
     public static List<Component> replacePlaceholderList(@NotNull String placeholder, @Nullable List<Component> dst, @NotNull List<Component> src) {
         if (dst == null) return null;
 
@@ -248,9 +239,7 @@ public class ComponentUtil {
         // Need to remove the raw placeholder from dst
         result.remove(placeholderIdx);
         result.addAll(placeholderIdx, src);
-        // for (final Component line : Lists.reverse(src)) {
-        //     result.add(placeholderIdx, line);
-        // }
+
         return result;
     }
 
