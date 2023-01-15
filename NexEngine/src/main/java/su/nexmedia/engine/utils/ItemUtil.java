@@ -103,43 +103,34 @@ public class ItemUtil {
      * @param meta     an item meta which the replacer applies to
      * @param replacer a string replacer
      *
-     * @see #replaceNameAndLore(boolean, ItemMeta, UnaryOperator[])
+     * @return true if the item meta changed
      */
     @SafeVarargs
-    public static void replaceNameAndLore(@Nullable ItemMeta meta, @NotNull UnaryOperator<String>... replacer) {
-        if (replacer.length == 0) return;
-        replaceNameAndLore(false, meta, replacer);
-    }
-
-    /**
-     * Applies the string replacer to the display name and lore of the item meta.
-     *
-     * @param unfoldNewline true to unfold newline for the item lore
-     * @param meta          the item meta to be modified
-     * @param replacer      a string replacer
-     */
-    @SafeVarargs
-    public static void replaceNameAndLore(boolean unfoldNewline, @Nullable ItemMeta meta, @NotNull UnaryOperator<String>... replacer) {
-        if (meta == null || replacer.length == 0) return;
+    public static boolean replaceNameAndLore(@Nullable ItemMeta meta, @NotNull UnaryOperator<String>... replacer) {
+        if (meta == null || replacer.length == 0) return false;
 
         // Replace item name
         Component name;
         if ((name = meta.displayName()) != null) {
-            name = ComponentUtil.replace(name, replacer); // Reassign
+            name = ComponentUtil.replace(name, replacer);
             meta.displayName(name);
         }
 
         // Replace item lore
         List<Component> lore;
         if ((lore = meta.lore()) != null) {
-            lore = ComponentUtil.replace(lore, replacer); // Reassign
-            if (unfoldNewline) {
-                List<String> str$newLore = ComponentUtil.asMiniMessage(lore);
-                str$newLore = StringUtil.unfoldByNewline(str$newLore);
-                lore = ComponentUtil.asComponent(str$newLore);
-            }
+            lore = ComponentUtil.replace(lore, replacer);
             meta.lore(ComponentUtil.stripEmpty(lore));
         }
+
+        return name != null || lore != null;
+    }
+
+    /**
+     * @see #replacePlaceholderListComponent(ItemMeta, String, List)
+     */
+    public static boolean replacePlaceholderListString(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer) {
+        return replacePlaceholderListComponent(meta, placeholder, ComponentUtil.asComponent(replacer));
     }
 
     /**
@@ -152,13 +143,16 @@ public class ItemUtil {
      * @param replacer    the list of stings that will replace the given placeholder
      *
      * @see StringUtil#replace(List, String, boolean, List)
+     *
+     * @return true if the item meta changed
      */
-    public static void replaceSpanLore(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer) {
+    public static boolean replacePlaceholderListComponent(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<Component> replacer) {
         List<Component> lore;
-        if (meta == null || (lore = meta.lore()) == null) return;
-        lore = ComponentUtil.replace(lore, placeholder, false, ComponentUtil.asComponent(replacer));
+        if (meta == null || (lore = meta.lore()) == null) return false;
+        lore = ComponentUtil.replace(lore, placeholder, false, replacer);
         lore = ComponentUtil.stripEmpty(lore);
         meta.lore(lore);
+        return true;
     }
 
     public static boolean isWeapon(@NotNull ItemStack item) {
