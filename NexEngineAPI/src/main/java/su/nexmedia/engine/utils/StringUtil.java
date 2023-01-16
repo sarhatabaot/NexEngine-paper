@@ -305,29 +305,18 @@ public class StringUtil {
         return original.substring(0, 1).toUpperCase() + original.substring(1);
     }
 
+    @Deprecated
     @Contract(pure = true)
     public static @NotNull List<String> getByPartialMatches(@NotNull List<String> originals, @NotNull String token, int steps) {
-        token = token.toLowerCase();
+        return getByPartialMatches(originals, token);
+    }
 
-        int[] parts = NumberUtil.splitIntoParts(token.length(), steps);
-        int lastIndex = 0;
-        StringBuilder builder = new StringBuilder();
-        for (int partSize : parts) {
-            String sub = token.substring(lastIndex, lastIndex + partSize);
-            lastIndex += partSize;
-
-            builder.append(sub).append("(?:.*)");
-        }
-
-        Pattern pattern = Pattern.compile(builder.toString());
-        List<String> list = new ArrayList<>(originals.stream().filter(orig -> pattern.matcher(orig.toLowerCase()).matches()).toList());
-        /*for (String src : originals) {
-            if (src.toLowerCase().startsWith(token.toLowerCase())) {
-                list.add(src);
-            }
-        }*/
-        Collections.sort(list);
-        return list;
+    @Contract(pure = true)
+    public static @NotNull List<String> getByPartialMatches(@NotNull List<String> originals, @NotNull String token) {
+        String tokenLowerCase = token.toLowerCase();
+        List<String> matches = new ArrayList<>();
+        org.bukkit.util.StringUtil.copyPartialMatches(tokenLowerCase, originals, matches);
+        return matches;
     }
 
     public static @NotNull String extractCommandName(@NotNull String cmd) {

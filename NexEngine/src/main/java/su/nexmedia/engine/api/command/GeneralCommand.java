@@ -11,10 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class GeneralCommand<P extends NexPlugin<P>> extends AbstractCommand<P> implements CommandExecutor, TabExecutor {
 
@@ -88,22 +85,23 @@ public abstract class GeneralCommand<P extends NexPlugin<P>> extends AbstractCom
     }
 
     @Override
-    public final List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd,
-                                            @NotNull String label, String[] args) {
+    public final List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
 
         if (!(sender instanceof Player player) || args.length == 0) return Collections.emptyList();
 
         AbstractCommand<P> command = this.findChildren(args);
         if (!command.hasPermission(sender)) return Collections.emptyList();
 
-        if (!command.getChildrens().isEmpty()) {
-            List<String> list = new ArrayList<>();
-            command.getChildrens().stream().filter(child -> child.hasPermission(sender))
-                .forEach(child -> list.addAll(Arrays.asList(child.getAliases())));
-            return StringUtil.getByPartialMatches(list, args[args.length - 1], 2);
+        Collection<AbstractCommand<P>> children = command.getChildrens();
+        if (!children.isEmpty()) {
+            List<String> filteredSubCommands = new ArrayList<>();
+            children.stream()
+                .filter(child -> child.hasPermission(sender))
+                .forEach(child -> filteredSubCommands.addAll(Arrays.asList(child.getAliases())));
+            return StringUtil.getByPartialMatches(filteredSubCommands, args[args.length - 1]);
+        } else {
+            List<String> list = command.getTab(player, command.equals(this) ? (args.length) : (args.length - 1), args);
+            return StringUtil.getByPartialMatches(list, args[args.length - 1]);
         }
-
-        List<String> list = command.getTab(player, command.equals(this) ? (args.length) : (args.length - 1), args);
-        return StringUtil.getByPartialMatches(list, args[args.length - 1], 2);
     }
 }
