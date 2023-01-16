@@ -181,13 +181,15 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
 
             // Minecraft shows custom displayName & lore with ITALIC by default.
             // We remove the ITALIC style, leaving it to the end-users to decide.
-            TextDecorationAndState noItalic = TextDecoration.ITALIC.withState(false);
+            TextDecorationAndState italicOff = TextDecoration.ITALIC.withState(false);
             if (meta.hasDisplayName()) {
-                Component modified = meta.displayName().applyFallbackStyle(noItalic);
+                Component modified = meta.displayName().applyFallbackStyle(italicOff);
                 meta.displayName(modified);
             }
             if (meta.hasLore()) {
-                List<Component> modified = meta.lore().stream().map(line -> line.applyFallbackStyle(noItalic)).toList();
+                List<Component> modified = meta.lore().stream()
+                    .map(line -> line.equals(Component.empty()) ? line : line.applyFallbackStyle(italicOff))
+                    .toList();
                 meta.lore(modified);
             }
         });
