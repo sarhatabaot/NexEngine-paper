@@ -12,6 +12,7 @@ import su.nexmedia.engine.hooks.Hooks;
 import su.nexmedia.engine.hooks.misc.FloodgateHook;
 import su.nexmedia.engine.hooks.misc.PlaceholderHook;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -121,7 +122,7 @@ public class PlayerUtil {
     }
 
     public static void addItem(@NotNull Player player, @NotNull ItemStack... items) {
-        Stream.of(items).forEach(item -> addItem(player, item, item.getAmount()));
+        Arrays.asList(items).forEach(item -> addItem(player, item, item.getAmount()));
     }
 
     public static void addItem(@NotNull Player player, @NotNull ItemStack item2, int amount) {
