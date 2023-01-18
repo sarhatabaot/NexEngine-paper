@@ -1,27 +1,32 @@
 package su.nexmedia.engine.api.lang;
 
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.utils.CollectionsUtil;
+import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.message.NexParser;
 import su.nexmedia.engine.utils.regex.RegexUtil;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 public class LangMessage {
 
-    @Deprecated private static final Pattern              PATTERN_MESSAGE_FULL   = Pattern.compile("(\\{message:)+(.+?)}+(.*)");
+    @Deprecated private static final Pattern PATTERN_MESSAGE_FULL = Pattern.compile("(\\{message:)+(.+?)}+(.*)");
     @Deprecated private static final Map<String, Pattern> PATTERN_MESSAGE_PARAMS = new HashMap<>();
 
     private static final Pattern PATTERN_OPTIONS = Pattern.compile("<!(.*?)!>");
@@ -52,14 +57,14 @@ public class LangMessage {
 
     private final NexPlugin<?> plugin;
 
-    /* All the text data are stored as MiniMessage string */
+    // All the text data are stored as MiniMessage string
     private String msgRaw;
     private String msgLocalized;
 
-    private OutputType type       = OutputType.CHAT;
-    private boolean    hasPrefix  = true;
-    private Sound      sound;
-    private int[]      titleTimes = new int[3];
+    private OutputType type = OutputType.CHAT;
+    private boolean hasPrefix = true;
+    private Sound sound;
+    private int[] titleTimes = new int[3];
 
     /**
      * Constructs a new instance with default settings.
@@ -75,16 +80,16 @@ public class LangMessage {
     /**
      * Constructs a copy of this instance.
      *
-     * @param from an instance
+     * @param other an instance
      */
-    LangMessage(@NotNull LangMessage from) {
-        this.plugin = from.plugin;
-        this.msgRaw = from.getRaw();
-        this.msgLocalized = from.getLocalized();
-        this.type = from.type;
-        this.hasPrefix = from.hasPrefix;
-        this.sound = from.sound;
-        this.titleTimes = Arrays.copyOf(from.titleTimes, from.titleTimes.length);
+    LangMessage(@NotNull LangMessage other) {
+        this.plugin = other.plugin;
+        this.msgRaw = other.getRaw();
+        this.msgLocalized = other.getLocalized();
+        this.type = other.type;
+        this.hasPrefix = other.hasPrefix;
+        this.sound = other.sound;
+        this.titleTimes = Arrays.copyOf(other.titleTimes, other.titleTimes.length);
     }
 
     @Deprecated
@@ -161,6 +166,10 @@ public class LangMessage {
         return this.msgLocalized;
     }
 
+    public @NotNull Component getLocalizedComponent() {
+        return ComponentUtil.asComponent(this.msgLocalized);
+    }
+
     private void setLocalized(@NotNull String msgLocalized) {
         this.msgLocalized = msgLocalized;
     }
@@ -179,7 +188,6 @@ public class LangMessage {
 
     public @NotNull LangMessage replace(@NotNull UnaryOperator<String> replacer) {
         if (this.isEmpty()) return this;
-
         LangMessage msgCopy = new LangMessage(this);
         msgCopy.setLocalized(replacer.apply(msgCopy.getLocalized()));
         return msgCopy;
@@ -190,30 +198,26 @@ public class LangMessage {
     }
 
     public void broadcast() {
-        if (this.isEmpty()) return;
-
-        Bukkit.getServer().getOnlinePlayers().forEach(this::send);
-        this.send(Bukkit.getServer().getConsoleSender());
+        if (!this.isEmpty()) this.send(Bukkit.getServer()); // TODO verity if it works
     }
 
-    public void send(@NotNull CommandSender sender) {
+    public void send(@NotNull Audience audience) {
         if (this.isEmpty()) return;
 
-        if (this.sound != null && sender instanceof Player player) {
+        if (this.sound != null && audience instanceof Player player) {
             MessageUtil.playSound(player, this.sound);
         }
 
         if (this.type == LangMessage.OutputType.CHAT) {
             String prefix = hasPrefix ? plugin.getConfigManager().pluginPrefix : "";
-            this.asList().forEach(line -> MessageUtil.sendMessage(sender, prefix + line));
+            this.asList().forEach(line -> MessageUtil.sendMessage(audience, prefix + line));
             return;
         }
 
-        if (sender instanceof Player player) {
+        if (audience instanceof Player player) {
             if (this.type == LangMessage.OutputType.ACTION_BAR) {
                 MessageUtil.sendActionBar(player, this.getLocalized());
-            }
-            else if (this.type == LangMessage.OutputType.TITLES) {
+            } else if (this.type == LangMessage.OutputType.TITLES) {
                 List<String> list = this.asList();
                 String title = list.size() > 0 ? NexParser.toPlainText(list.get(0)) : "";
                 String subtitle = list.size() > 1 ? NexParser.toPlainText(list.get(1)) : "";
@@ -223,10 +227,15 @@ public class LangMessage {
     }
 
     public @NotNull List<String> asList() {
-        if (this.isEmpty()) return Collections.emptyList();
-        return Stream.of(this.getLocalized().split("\\\\n"))
-//                     .filter(Predicate.not(String::isEmpty)) // leave it to the caller to deal with
-                     .toList();
+        if (this.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(this.getLocalized().split(Pattern.quote("\\n")));
+        }
+    }
+
+    public @NotNull List<Component> asComponentList() {
+        return ComponentUtil.asComponent(this.asList());
     }
 
     /**
