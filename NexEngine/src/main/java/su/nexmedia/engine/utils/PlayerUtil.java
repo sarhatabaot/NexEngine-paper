@@ -66,7 +66,8 @@ public class PlayerUtil {
     public static int countItem(@NotNull Player player, @NotNull Predicate<ItemStack> predicate) {
         return Stream.of(player.getInventory().getStorageContents())
             .filter(item -> item != null && !item.getType().isAir() && predicate.test(item))
-            .mapToInt(ItemStack::getAmount).sum();
+            .mapToInt(ItemStack::getAmount)
+            .sum();
     }
 
     public static int countItem(@NotNull Player player, @NotNull ItemStack item) {
@@ -125,13 +126,13 @@ public class PlayerUtil {
         Arrays.asList(items).forEach(item -> addItem(player, item, item.getAmount()));
     }
 
-    public static void addItem(@NotNull Player player, @NotNull ItemStack item2, int amount) {
-        if (amount <= 0 || item2.getType().isAir()) return;
+    public static void addItem(@NotNull Player player, @NotNull ItemStack add, int amount) {
+        if (amount <= 0 || add.getType().isAir()) return;
 
         Inventory inventory = player.getInventory();
         World world = player.getWorld();
 
-        ItemStack item = new ItemStack(item2);
+        ItemStack item = add.clone();
         item.setAmount(1);
 
         int space = countItemSpace(player, item);
