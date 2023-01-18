@@ -37,7 +37,7 @@ public class ComponentUtil {
      *
      * @param miniMessage a list of a MiniMessage strings
      *
-     * @return a list of components
+     * @return an unmodifiable list of components
      */
     @Contract(pure = true)
     public static @NotNull List<Component> asComponent(@Nullable List<String> miniMessage) {
@@ -67,7 +67,7 @@ public class ComponentUtil {
      *
      * @param component a list of components
      *
-     * @return a list of strings in MiniMessage representation
+     * @return an unmodifiable list of strings in MiniMessage representation
      */
     @Contract(pure = true)
     public static @NotNull List<String> asMiniMessage(@Nullable List<Component> component) {
@@ -106,7 +106,7 @@ public class ComponentUtil {
      *
      * @param componentList a list of components which may contain empty lines
      *
-     * @return a modified copy of the list
+     * @return a mutable modified copy of the list
      */
     @Contract(pure = true)
     public static @NotNull List<Component> compressEmptyLines(@NotNull List<Component> componentList) {
@@ -169,7 +169,7 @@ public class ComponentUtil {
      * @param replacer      a string replacer
      * @param componentList a list of components which the string replacer applies to
      *
-     * @return a modified copy of the list
+     * @return a mutable modified copy of the list
      */
     @SafeVarargs
     @Contract(pure = true)
@@ -217,7 +217,7 @@ public class ComponentUtil {
      * @param dst         the lore which contains the placeholder to be modified
      * @param src         the lore to be copied and inserted into the dst lore
      *
-     * @return a modified copy of the dst list
+     * @return a mutable modified copy of the dst list
      */
     @Contract(pure = true, value = "_, null, _ -> null; _, !null, _ -> !null ")
     public static List<Component> replacePlaceholderList(@NotNull String placeholder, @Nullable List<Component> dst, @NotNull List<Component> src) {
