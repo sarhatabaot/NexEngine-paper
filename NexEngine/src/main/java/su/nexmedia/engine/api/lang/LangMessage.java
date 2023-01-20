@@ -1,5 +1,6 @@
 package su.nexmedia.engine.api.lang;
 
+import com.google.common.collect.Sets;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -7,19 +8,12 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.NexPlugin;
-import su.nexmedia.engine.utils.CollectionsUtil;
-import su.nexmedia.engine.utils.ComponentUtil;
-import su.nexmedia.engine.utils.MessageUtil;
-import su.nexmedia.engine.utils.Placeholders;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.*;
 import su.nexmedia.engine.utils.message.NexParser;
 import su.nexmedia.engine.utils.regex.RegexUtil;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -198,7 +192,20 @@ public class LangMessage {
     }
 
     public void broadcast() {
-        if (!this.isEmpty()) this.send(Bukkit.getServer()); // TODO verity if it works
+        if (!this.isEmpty()) this.send(Bukkit.getServer());
+    }
+
+    public void broadcast(Audience exempt) {
+        this.broadcast(Predicate.not(exempt::equals));
+    }
+
+    public void broadcast(Audience... exempt) {
+        Set<Audience> exemptSet = Sets.newHashSet(exempt);
+        this.broadcast(Predicate.not(exemptSet::contains));
+    }
+
+    public void broadcast(Predicate<Audience> filter) {
+        if (!this.isEmpty()) this.send(Bukkit.getServer().filterAudience(filter));
     }
 
     public void send(@NotNull Audience audience) {
@@ -208,16 +215,16 @@ public class LangMessage {
             MessageUtil.playSound(player, this.sound);
         }
 
-        if (this.type == LangMessage.OutputType.CHAT) {
+        if (this.type == OutputType.CHAT) {
             String prefix = hasPrefix ? plugin.getConfigManager().pluginPrefix : "";
             this.asList().forEach(line -> MessageUtil.sendMessage(audience, prefix + line));
             return;
         }
 
         if (audience instanceof Player player) {
-            if (this.type == LangMessage.OutputType.ACTION_BAR) {
+            if (this.type == OutputType.ACTION_BAR) {
                 MessageUtil.sendActionBar(player, this.getLocalized());
-            } else if (this.type == LangMessage.OutputType.TITLES) {
+            } else if (this.type == OutputType.TITLES) {
                 List<String> list = this.asList();
                 String title = list.size() > 0 ? NexParser.toPlainText(list.get(0)) : "";
                 String subtitle = list.size() > 1 ? NexParser.toPlainText(list.get(1)) : "";
