@@ -305,12 +305,6 @@ public class StringUtil {
         return original.substring(0, 1).toUpperCase() + original.substring(1);
     }
 
-    @Deprecated
-    @Contract(pure = true)
-    public static @NotNull List<String> getByPartialMatches(@NotNull List<String> originals, @NotNull String token, int steps) {
-        return getByPartialMatches(originals, token);
-    }
-
     @Contract(pure = true)
     public static @NotNull List<String> getByPartialMatches(@NotNull List<String> originals, @NotNull String token) {
         String tokenLowerCase = token.toLowerCase();
