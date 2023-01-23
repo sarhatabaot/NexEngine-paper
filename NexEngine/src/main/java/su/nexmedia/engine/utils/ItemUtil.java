@@ -127,6 +127,15 @@ public class ItemUtil {
         return name != null || lore != null;
     }
 
+    public static boolean replacePlaceholderListComponent(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<Component> replacer, boolean compressEmpty, boolean keep) {
+        List<Component> lore;
+        if (meta == null || (lore = meta.lore()) == null) return false;
+        lore = ComponentUtil.replacePlaceholderList(placeholder, lore, replacer, keep);
+        if (compressEmpty) lore = ComponentUtil.compressEmptyLines(lore);
+        meta.lore(lore);
+        return true;
+    }
+
     /**
      * Modifies the item lore such that the <b>first</b> placeholder found in the lore is replaced with the given list
      * of strings. Note that the replaced lore will span multiple lines of the lore, starting at the given placeholder,
@@ -142,12 +151,7 @@ public class ItemUtil {
      * @see ComponentUtil#replacePlaceholderList(String, List, List)
      */
     public static boolean replacePlaceholderListComponent(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<Component> replacer, boolean compressEmpty) {
-        List<Component> lore;
-        if (meta == null || (lore = meta.lore()) == null) return false;
-        lore = ComponentUtil.replacePlaceholderList(placeholder, lore, replacer);
-        if (compressEmpty) lore = ComponentUtil.compressEmptyLines(lore);
-        meta.lore(lore);
-        return true;
+        return replacePlaceholderListComponent(meta, placeholder, replacer, compressEmpty, false);
     }
 
     /**
@@ -155,6 +159,13 @@ public class ItemUtil {
      */
     public static boolean replacePlaceholderListComponent(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<Component> replacer) {
         return replacePlaceholderListComponent(meta, placeholder, replacer, false);
+    }
+
+    /**
+     * @see #replacePlaceholderListComponent(ItemMeta, String, List, boolean, boolean)
+     */
+    public static boolean replacePlaceholderListString(@Nullable ItemMeta meta, @NotNull String placeholder, @NotNull List<String> replacer, boolean compressEmpty, boolean keep) {
+        return replacePlaceholderListComponent(meta, placeholder, ComponentUtil.asComponent(replacer), compressEmpty, keep);
     }
 
     /**

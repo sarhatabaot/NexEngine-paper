@@ -171,17 +171,35 @@ public class StringUtil {
 
     @Contract(pure = true, value = "_, null, _ -> null; _, !null, _ -> !null ")
     public static List<String> replacePlaceholderList(@NotNull String placeholder, @Nullable List<String> dst, @NotNull List<String> src) {
+        return replacePlaceholderList(placeholder, dst, src, false);
+    }
+
+    @Contract(pure = true, value = "_, null, _, _ -> null; _, !null, _, _ -> !null ")
+    public static List<String> replacePlaceholderList(@NotNull String placeholder, @Nullable List<String> dst, @NotNull List<String> src, boolean keep) {
         if (dst == null) return null;
 
-        // Let's find the index of placeholder in dst
+        // Let's find which line (in the dst) has the placeholder
         int placeholderIdx = -1;
+        String placeholderLine = null;
         for (int i = 0; i < dst.size(); i++) {
-            if (dst.get(i).contains(placeholder)) {
+            placeholderLine = dst.get(i);
+            if (placeholderLine.contains(placeholder)) {
                 placeholderIdx = i;
                 break;
             }
         }
         if (placeholderIdx == -1) return dst;
+
+        // Let's make the list to be inserted into the dst
+        if (keep) {
+            src = new ArrayList<>(src);
+            ListIterator<String> it = src.listIterator();
+            while (it.hasNext()) {
+                String line = it.next();
+                String replaced = placeholderLine.replace(placeholder, line);
+                it.set(replaced);
+            }
+        }
 
         // Insert the src into the dst
         List<String> result = new ArrayList<>(dst);

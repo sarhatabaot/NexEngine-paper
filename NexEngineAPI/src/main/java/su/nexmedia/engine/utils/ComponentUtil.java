@@ -11,6 +11,7 @@ import su.nexmedia.engine.api.manager.IPlaceholder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.UnaryOperator;
 
 public class ComponentUtil {
@@ -221,23 +222,52 @@ public class ComponentUtil {
      */
     @Contract(pure = true, value = "_, null, _ -> null; _, !null, _ -> !null ")
     public static List<Component> replacePlaceholderList(@NotNull String placeholder, @Nullable List<Component> dst, @NotNull List<Component> src) {
+        return replacePlaceholderList(placeholder, dst, src, false);
+    }
+
+    /**
+     * Inserts the src list into the dst list, at the position where the given placeholder presents.
+     * <p>
+     * Note that only the first placeholder encountered will be replaced.
+     *
+     * @param placeholder the placeholder in the lore
+     * @param dst         the lore which contains the placeholder to be modified
+     * @param src         the lore to be copied and inserted into the dst lore
+     * @param keep        true to keep the other content around the placeholder
+     *
+     * @return a mutable modified copy of the dst list
+     */
+    @Contract(pure = true, value = "_, null, _, _ -> null; _, !null, _, _ -> !null ")
+    public static List<Component> replacePlaceholderList(@NotNull String placeholder, @Nullable List<Component> dst, @NotNull List<Component> src, boolean keep) {
         if (dst == null) return null;
 
-        // Let's find the index of placeholder in dst
+        // Let's find which line (in the dst) has the placeholder
         int placeholderIdx = -1;
+        Component placeholderLine = null;
         for (int i = 0; i < dst.size(); i++) {
+            placeholderLine = dst.get(i);
             // Component is complex. We use plain text to find the pos of the placeholder
-            if (ComponentUtil.asPlainText(dst.get(i)).contains(placeholder)) {
+            if (asPlainText(placeholderLine).contains(placeholder)) {
                 placeholderIdx = i;
                 break;
             }
         }
         if (placeholderIdx == -1) return dst;
 
+        // Let's make the list to be inserted into the dst
+        if (keep) {
+            src = new ArrayList<>(src);
+            ListIterator<Component> it = src.listIterator();
+            while (it.hasNext()) {
+                Component line = it.next();
+                Component replaced = replace(placeholderLine, placeholder, line);
+                it.set(replaced);
+            }
+        }
+
         // Insert the src into the dst
         List<Component> result = new ArrayList<>(dst);
-        // Need to remove the raw placeholder from dst
-        result.remove(placeholderIdx);
+        result.remove(placeholderIdx); // Need to remove the raw placeholder from dst
         result.addAll(placeholderIdx, src);
 
         return result;
