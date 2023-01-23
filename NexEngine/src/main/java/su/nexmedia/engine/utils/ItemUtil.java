@@ -182,6 +182,14 @@ public class ItemUtil {
         return replacePlaceholderListComponent(meta, placeholder, ComponentUtil.asComponent(replacer));
     }
 
+    @SuppressWarnings("DataFlowIssue")
+    public static void removeItalic(ItemMeta meta) {
+        if (meta.hasDisplayName())
+            meta.displayName(ComponentUtil.removeItalic(meta.displayName()));
+        if (meta.hasLore())
+            meta.lore(ComponentUtil.removeItalic(meta.lore()));
+    }
+
     public static boolean isWeapon(@NotNull ItemStack item) {
         return isSword(item) || isAxe(item) || isTrident(item);
     }

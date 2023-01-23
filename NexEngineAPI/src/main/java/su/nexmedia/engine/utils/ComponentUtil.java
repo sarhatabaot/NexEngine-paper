@@ -1,6 +1,7 @@
 package su.nexmedia.engine.utils;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.Contract;
@@ -271,6 +272,16 @@ public class ComponentUtil {
         result.addAll(placeholderIdx, src);
 
         return result;
+    }
+
+    @Contract(pure = true)
+    public static @NotNull Component removeItalic(@NotNull Component component) {
+        return component.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+    }
+
+    @Contract(pure = true)
+    public static @NotNull List<Component> removeItalic(@NotNull List<Component> component) {
+        return component.stream().map(ComponentUtil::removeItalic).toList();
     }
 
 }
