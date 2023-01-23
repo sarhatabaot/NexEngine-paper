@@ -1,8 +1,6 @@
 package su.nexmedia.engine.api.menu;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.format.TextDecorationAndState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -181,17 +179,7 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
 
             // Minecraft shows custom displayName & lore with ITALIC by default.
             // We remove the ITALIC style, leaving it to the end-users to decide.
-            TextDecorationAndState italicOff = TextDecoration.ITALIC.withState(false);
-            if (meta.hasDisplayName()) {
-                Component modified = meta.displayName().applyFallbackStyle(italicOff);
-                meta.displayName(modified);
-            }
-            if (meta.hasLore()) {
-                List<Component> modified = meta.lore().stream()
-                    .map(line -> line.equals(Component.empty()) ? line : line.applyFallbackStyle(italicOff))
-                    .toList();
-                meta.lore(modified);
-            }
+            ItemUtil.removeItalic(meta);
         });
     }
 

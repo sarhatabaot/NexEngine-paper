@@ -281,7 +281,12 @@ public class ComponentUtil {
 
     @Contract(pure = true)
     public static @NotNull List<Component> removeItalic(@NotNull List<Component> component) {
-        return component.stream().map(ComponentUtil::removeItalic).toList();
+        return component.stream().map(line -> {
+            if (Component.empty().equals(line))
+                return line;
+            else
+                return ComponentUtil.removeItalic(line);
+        }).toList();
     }
 
 }
