@@ -1,7 +1,10 @@
 package su.nexmedia.engine.api.config;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,8 +36,8 @@ import java.util.stream.IntStream;
 
 public class JYML extends YamlConfiguration {
 
-    private final File    file;
-    private       boolean isChanged = false;
+    private final File file;
+    private boolean isChanged = false;
 
     public JYML(@NotNull String path, @NotNull String file) {
         this(new File(path, file));
@@ -61,8 +64,7 @@ public class JYML extends YamlConfiguration {
             try {
                 InputStream input = plugin.getClass().getResourceAsStream(filePath);
                 if (input != null) FileUtil.copy(input, file);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -89,8 +91,7 @@ public class JYML extends YamlConfiguration {
             try {
                 JOption<?> option = (JOption<?>) field.get(from);
                 option.read(cfg);
-            }
-            catch (IllegalAccessException e) {
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -105,8 +106,7 @@ public class JYML extends YamlConfiguration {
     public void save() {
         try {
             this.save(this.file);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             NexEngine.get().error("Could not save config: " + file.getName());
             e.printStackTrace();
         }
@@ -126,8 +126,7 @@ public class JYML extends YamlConfiguration {
             this.load(this.file);
             this.isChanged = false;
             return true;
-        }
-        catch (IOException | InvalidConfigurationException e) {
+        } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
         return false;
@@ -143,23 +142,18 @@ public class JYML extends YamlConfiguration {
     public void set(@NotNull String path, @Nullable Object value) {
         if (value instanceof JOption.Writer writer) {
             writer.write(this, path);
-        }
-        else {
-            if (value instanceof String str) {
+        } else {
+            if (value instanceof String) {
                 // Keep it as it is
-            }
-            else if (value instanceof Component component) {
+            } else if (value instanceof Component component) {
                 value = ComponentUtil.asMiniMessage(component);
-            }
-            else if (value instanceof Collection<?> collection) {
+            } else if (value instanceof Collection<?> collection) {
                 List<Object> list = new ArrayList<>(collection);
                 list.replaceAll(obj -> obj instanceof Component component ? ComponentUtil.asMiniMessage(component) : obj);
                 value = list;
-            }
-            else if (value instanceof Location location) {
+            } else if (value instanceof Location location) {
                 value = LocationUtil.serialize(location);
-            }
-            else if (value instanceof Enum<?> en) {
+            } else if (value instanceof Enum<?> en) {
                 value = en.name();
             }
             super.set(path, value);
@@ -326,7 +320,7 @@ public class JYML extends YamlConfiguration {
         String name = this.getString(path + "Name");
         meta.displayName(name != null ? ComponentUtil.asComponent(name) : null);
         List<Component> lore = this.getComponentList(path + "Lore");
-        meta.lore(lore);
+        meta.lore(lore.isEmpty() ? null : lore);
 
         for (String sKey : this.getSection(path + "Enchants")) {
             Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(sKey.toLowerCase()));
@@ -344,8 +338,7 @@ public class JYML extends YamlConfiguration {
         List<String> flags = this.getStringList(path + "Item_Flags");
         if (flags.contains(Placeholders.WILDCARD)) {
             meta.addItemFlags(ItemFlag.values());
-        }
-        else {
+        } else {
             flags.stream().map(str -> CollectionsUtil.getEnum(str, ItemFlag.class)).filter(Objects::nonNull).forEach(meta::addItemFlags);
         }
 
@@ -354,8 +347,7 @@ public class JYML extends YamlConfiguration {
             Color color = StringUtil.parseColor(colorRaw);
             if (meta instanceof LeatherArmorMeta armorMeta) {
                 armorMeta.setColor(color);
-            }
-            else if (meta instanceof PotionMeta potionMeta) {
+            } else if (meta instanceof PotionMeta potionMeta) {
                 potionMeta.setColor(color);
             }
         }
@@ -456,8 +448,7 @@ public class JYML extends YamlConfiguration {
         String colorRaw = null;
         if (meta instanceof PotionMeta potionMeta) {
             color = potionMeta.getColor();
-        }
-        else if (meta instanceof LeatherArmorMeta armorMeta) {
+        } else if (meta instanceof LeatherArmorMeta armorMeta) {
             color = armorMeta.getColor();
         }
         if (color != null) {
