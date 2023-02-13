@@ -25,7 +25,7 @@ dependencies {
     // Internal libraries
     compileOnly("com.zaxxer:HikariCP:5.0.1")
     compileOnly("com.mojang:authlib:3.16.29")
-    compileOnly("io.netty:netty-all:4.1.85.Final")
+    compileOnly("io.netty:netty-all:4.1.86.Final")
     compileOnly("org.xerial:sqlite-jdbc:3.40.0.0")
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
@@ -48,8 +48,6 @@ bukkit {
 }
 
 tasks {
-    val outputFileName = "NexEngine-${project.version}"
-
     // Shadow settings
     build {
         dependsOn(shadowJar)
@@ -58,7 +56,7 @@ tasks {
         minimize {
             exclude(dependency("su.nexmedia:.*:.*"))
         }
-        archiveFileName.set("$outputFileName.jar")
+        archiveFileName.set("NexEngine-${project.version}.jar")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir"))
     }
