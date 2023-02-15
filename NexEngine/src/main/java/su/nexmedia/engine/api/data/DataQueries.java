@@ -3,6 +3,7 @@ package su.nexmedia.engine.api.data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.data.connection.AbstractDataConnector;
+import su.nexmedia.engine.api.data.sql.SQLQueries;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,42 +14,47 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class DataQueries {
 
     @Nullable
-    public static <T> T readData(@NotNull AbstractDataConnector connector,
-                                 @NotNull String table,
-                                 @NotNull Map<String, String> whereMap,
-                                 @NotNull Function<ResultSet, T> dataFunction) {
+    public static <T> T readData(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Map<String, String> whereMap,
+        @NotNull Function<ResultSet, T> dataFunction) {
         return readData(connector, table, Collections.emptyList(), whereMap, dataFunction);
     }
 
     @Nullable
-    public static <T> T readData(@NotNull AbstractDataConnector connector,
-                                 @NotNull String table,
-                                 @NotNull Collection<String> columnsList,
-                                 @NotNull Map<String, String> whereMap,
-                                 @NotNull Function<ResultSet, T> dataFunction) {
+    public static <T> T readData(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Collection<String> columnsList,
+        @NotNull Map<String, String> whereMap,
+        @NotNull Function<ResultSet, T> dataFunction) {
         List<T> list = readData(connector, table, columnsList, whereMap, dataFunction, 1);
         return list.isEmpty() ? null : list.get(0);
     }
 
     @NotNull
-    public static <T> List<T> readData(@NotNull AbstractDataConnector connector,
-                                                @NotNull String table,
-                                                @NotNull Map<String, String> whereMap,
-                                                @NotNull Function<ResultSet, T> dataFunction,
-                                                int amount) {
+    public static <T> List<@NotNull T> readData(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Map<String, String> whereMap,
+        @NotNull Function<ResultSet, T> dataFunction,
+        int amount) {
         return readData(connector, table, Collections.emptyList(), whereMap, dataFunction, amount);
     }
 
     @NotNull
-    public static <T> List<T> readData(@NotNull AbstractDataConnector connector,
-                                                @NotNull String table,
-                                                @NotNull Collection<String> columnsList,
-                                                @NotNull Map<String, String> whereMap,
-                                                @NotNull Function<ResultSet, T> dataFunction,
-                                                int amount) {
+    public static <T> List<@NotNull T> readData(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Collection<String> columnsList,
+        @NotNull Map<String, String> whereMap,
+        @NotNull Function<ResultSet, T> dataFunction,
+        int amount) {
 
         String columns = columnsList.isEmpty() ? "*" : columnsList.stream().map(column -> "`" + column + "`").collect(Collectors.joining(", "));
         String wheres = whereMap.keySet().stream().map(column -> "`" + column + "` = ?").collect(Collectors.joining(" AND "));
@@ -57,18 +63,20 @@ public class DataQueries {
         return executeQuery(connector, sql, table, whereMap.values(), dataFunction, amount);
     }
 
-    public static <T> void readData(@NotNull AbstractDataConnector connector,
-                                    @NotNull String table,
-                                    @NotNull Map<String, String> whereMap,
-                                    @NotNull Consumer<ResultSet> dataFunction) {
+    public static <T> void readData(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Map<String, String> whereMap,
+        @NotNull Consumer<ResultSet> dataFunction) {
         readData(connector, table, Collections.emptyList(), whereMap, dataFunction);
     }
 
-    public static <T> void readData(@NotNull AbstractDataConnector connector,
-                                    @NotNull String table,
-                                    @NotNull Collection<String> columnsList,
-                                    @NotNull Map<String, String> whereMap,
-                                    @NotNull Consumer<ResultSet> dataFunction) {
+    public static <T> void readData(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Collection<String> columnsList,
+        @NotNull Map<String, String> whereMap,
+        @NotNull Consumer<ResultSet> dataFunction) {
 
         String columns = columnsList.isEmpty() ? "*" : columnsList.stream().map(column -> "`" + column + "`").collect(Collectors.joining(", "));
         String wheres = whereMap.keySet().stream().map(column -> "`" + column + "` = ?").collect(Collectors.joining(" AND "));
@@ -77,10 +85,11 @@ public class DataQueries {
         executeQuery(connector, sql, table, whereMap.values(), dataFunction);
     }
 
-    public static boolean executeUpdate(@NotNull AbstractDataConnector connector,
-                                        @NotNull String table,
-                                        @NotNull LinkedHashMap<String, String> valuesMap,
-                                        @NotNull Map<String, String> whereMap) {
+    public static boolean executeUpdate(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull LinkedHashMap<String, String> valuesMap,
+        @NotNull Map<String, String> whereMap) {
 
         String values = valuesMap.keySet().stream().map(entry -> "`" + entry + "` = ?").collect(Collectors.joining(", "));
         String wheres = whereMap.keySet().stream().map(entry -> "`" + entry + "` = ?").collect(Collectors.joining(" AND "));
@@ -89,9 +98,10 @@ public class DataQueries {
         return executeStatement(connector, sql, valuesMap.values(), whereMap.values());
     }
 
-    public static boolean executeInsert(@NotNull AbstractDataConnector connector,
-                                        @NotNull String table,
-                                        @NotNull LinkedHashMap<String, String> keys) {
+    public static boolean executeInsert(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull LinkedHashMap<String, String> keys) {
 
         String columns = keys.keySet().stream().map(column -> "`" + column + "`").collect(Collectors.joining(", "));
         String values = keys.values().stream().map(value -> "?").collect(Collectors.joining(", "));
@@ -100,9 +110,10 @@ public class DataQueries {
         return executeStatement(connector, sql, new HashSet<>(), keys.values());
     }
 
-    public static boolean executeDelete(@NotNull AbstractDataConnector connector,
-                                        @NotNull String table,
-                                        @NotNull Map<String, String> whereMap) {
+    public static boolean executeDelete(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String table,
+        @NotNull Map<String, String> whereMap) {
 
         String wheres = whereMap.keySet().stream().map(entry -> "`" + entry + "` = ?").collect(Collectors.joining(" AND "));
         String sql = "DELETE FROM " + table + (wheres.isEmpty() ? "" : " WHERE " + wheres);
@@ -114,40 +125,28 @@ public class DataQueries {
         return executeStatement(connector, sql, Collections.emptySet());
     }
 
-    private static boolean executeStatement(@NotNull AbstractDataConnector connector, @NotNull String sql,
-                                            @NotNull Collection<String> values1) {
+    public static boolean executeStatement(
+        @NotNull AbstractDataConnector connector, @NotNull String sql,
+        @NotNull Collection<String> values1) {
         return executeStatement(connector, sql, values1, Collections.emptySet());
     }
 
-    private static boolean executeStatement(@NotNull AbstractDataConnector connector, @NotNull String sql,
-                                            @NotNull Collection<String> values1, @NotNull Collection<String> values2) {
-
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            int count = 1;
-            for (String columnName : values1) {
-                statement.setString(count++, columnName);
-            }
-            for (String columnValue : values2) {
-                statement.setString(count++, columnValue);
-            }
-
-            statement.executeUpdate();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+    public static boolean executeStatement(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String sql,
+        @NotNull Collection<String> values1,
+        @NotNull Collection<String> values2) {
+        return SQLQueries.executeStatement(connector, sql, values1, values2);
     }
 
     @NotNull
-    public static <T> List<T> executeQuery(@NotNull AbstractDataConnector connector, @NotNull String sql,
-                                                    @NotNull String table,
-                                                    @NotNull Collection<String> values1,
-                                                    @NotNull Function<ResultSet, T> dataFunction,
-                                                    int amount) {
+    @Deprecated
+    public static <T> List<@NotNull T> executeQuery(
+        @NotNull AbstractDataConnector connector, @NotNull String sql,
+        @NotNull String table,
+        @NotNull Collection<String> values1,
+        @NotNull Function<ResultSet, T> dataFunction,
+        int amount) {
 
         List<T> list = new ArrayList<>();
         try (Connection connection = connector.getConnection();
@@ -163,8 +162,7 @@ public class DataQueries {
                 list.add(dataFunction.apply(resultSet));
             }
             resultSet.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         list.removeIf(Objects::isNull);
@@ -172,11 +170,21 @@ public class DataQueries {
         return list;
     }
 
-    public static <T> void executeQuery(@NotNull AbstractDataConnector connector,
-                                        @NotNull String sql,
-                                        @NotNull String table,
-                                        @NotNull Collection<String> values1,
-                                        @NotNull Consumer<ResultSet> dataFunction) {
+    @NotNull
+    public static <T> List<@NotNull T> executeQuery(
+        @NotNull AbstractDataConnector connector, @NotNull String sql,
+        @NotNull Collection<String> values1,
+        @NotNull Function<ResultSet, T> dataFunction,
+        int amount) {
+        return SQLQueries.executeQuery(connector, sql, values1, dataFunction, amount);
+    }
+
+    public static <T> void executeQuery(
+        @NotNull AbstractDataConnector connector,
+        @NotNull String sql,
+        @NotNull String table,
+        @NotNull Collection<String> values1,
+        @NotNull Consumer<ResultSet> dataFunction) {
 
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -191,8 +199,7 @@ public class DataQueries {
                 dataFunction.accept(resultSet);
             }
             resultSet.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

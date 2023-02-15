@@ -8,22 +8,35 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.Reflex;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.regex.RegexUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class NexMessage {
 
+    private static final Pattern URL = Pattern.compile("(?:(https?)://)?([-\\w_\\.]{2,}\\.[a-z]{2,4})(/\\S*)?$");
+
     private String message;
     private final Map<String, NexComponent> components;
 
     public NexMessage(@NotNull String message) {
-        this.message = StringUtil.color(message);
+        this.message = Colorizer.legacy(message);
         this.components = new HashMap<>();
+
+        // Originally was in 'fromLegacyText' method of the TextComponent class.
+        Matcher matcher = RegexUtil.getMatcher(URL, Colorizer.strip(this.message));
+        while (RegexUtil.matcherFind(matcher)) {
+            String url = matcher.group(0);
+            String link = url.startsWith("http") ? url : "http://" + url;
+
+            this.addComponent(url, url).openURL(link);
+        }
     }
 
     @NotNull
@@ -73,6 +86,7 @@ public class NexMessage {
         if (!text.isEmpty()) {
             append(builder, fromLegacyText(text.toString()), ComponentBuilder.FormatRetention.ALL);
         }
+        TO_RETAIN.clear();
         return builder.create();
     }
 
@@ -96,12 +110,12 @@ public class NexMessage {
     // Так как этот фикс не встроен в API спигота, и все равно работает не так, как нужно, будем использовать свой.
 
     private static final Set<BaseComponent> TO_RETAIN = new HashSet<>();
-    private static final Method             GET_DUMMY = Reflex.getMethod(ComponentBuilder.class, "getDummy");
+    private static final Method GET_DUMMY = Reflex.getMethod(ComponentBuilder.class, "getDummy");
 
     @NotNull
     public static ComponentBuilder append(@NotNull ComponentBuilder orig,
-                                          @NotNull BaseComponent[] components,
-                                          @NotNull ComponentBuilder.FormatRetention retention) {
+        @NotNull BaseComponent[] components,
+        @NotNull ComponentBuilder.FormatRetention retention) {
         Preconditions.checkArgument(components.length != 0, "No components to append");
         for (BaseComponent component : components) {
             append(orig, component, retention);
@@ -111,12 +125,12 @@ public class NexMessage {
 
     @NotNull
     public static ComponentBuilder append(@NotNull ComponentBuilder orig,
-                                          @NotNull BaseComponent component,
-                                          @NotNull ComponentBuilder.FormatRetention retention) {
+        @NotNull BaseComponent component,
+        @NotNull ComponentBuilder.FormatRetention retention) {
         List<BaseComponent> parts = orig.getParts();
         BaseComponent previous = parts.isEmpty() ? null : parts.get(parts.size() - 1);
         if (previous == null) {
-            previous = GET_DUMMY == null ? null : (BaseComponent)  Reflex.invokeMethod(GET_DUMMY, orig);
+            previous = GET_DUMMY == null ? null : (BaseComponent) Reflex.invokeMethod(GET_DUMMY, orig);
             Reflex.setFieldValue(orig, "dummy", null);
         }
 
@@ -158,15 +172,13 @@ public class NexMessage {
                     }
                     try {
                         format = ChatColor.of(hex.toString());
-                    }
-                    catch (IllegalArgumentException ex) {
+                    } catch (IllegalArgumentException ex) {
                         format = null;
                     }
 
                     index += 12;
-                }
-                else {
-                    format = ChatColor.getByChar( letter );
+                } else {
+                    format = ChatColor.getByChar(letter);
                 }
                 if (format == null) continue;
 
@@ -179,21 +191,16 @@ public class NexMessage {
                 }
 
                 if (format == ChatColor.BOLD) {
-                    component.setBold( true );
-                }
-                else if (format == ChatColor.ITALIC) {
+                    component.setBold(true);
+                } else if (format == ChatColor.ITALIC) {
                     component.setItalic(true);
-                }
-                else if (format == ChatColor.UNDERLINE) {
+                } else if (format == ChatColor.UNDERLINE) {
                     component.setUnderlined(true);
-                }
-                else if (format == ChatColor.STRIKETHROUGH) {
+                } else if (format == ChatColor.STRIKETHROUGH) {
                     component.setStrikethrough(true);
-                }
-                else if (format == ChatColor.MAGIC) {
+                } else if (format == ChatColor.MAGIC) {
                     component.setObfuscated(true);
-                }
-                else {
+                } else {
                     if (format == ChatColor.RESET) {
                         format = defaultColor;
                     }
@@ -213,4 +220,5 @@ public class NexMessage {
         components.add(component);
         return components.toArray(new BaseComponent[0]);
     }
+
 }

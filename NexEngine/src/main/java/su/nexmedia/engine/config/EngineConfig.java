@@ -10,9 +10,11 @@ import java.util.UUID;
 
 public class EngineConfig {
 
+    @Deprecated
     private static Map<String, String> LOCALE_WORLD_NAMES;
 
     @NotNull
+    @Deprecated
     public static String getWorldName(@NotNull String world) {
         return LOCALE_WORLD_NAMES.getOrDefault(world, world);
     }
@@ -41,8 +43,7 @@ public class EngineConfig {
         String idRaw = cfg.getString("Head_Texture_Cache." + base64, UUID.randomUUID().toString());
         try {
             uuid = UUID.fromString(idRaw);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             uuid = UUID.randomUUID();
         }
 

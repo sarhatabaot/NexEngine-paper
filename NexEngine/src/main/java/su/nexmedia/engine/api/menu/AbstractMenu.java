@@ -5,15 +5,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.NexPlugin;
+import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.api.manager.ICleanable;
 import su.nexmedia.engine.api.type.ClickType;
+import su.nexmedia.engine.hooks.Hooks;
+import su.nexmedia.engine.hooks.misc.PlaceholderHook;
 import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
@@ -32,6 +36,7 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
 
     protected Component title;
     protected int size;
+    protected InventoryType inventoryType;
     protected JYML cfg;
 
     private MenuListener<P> listener;
@@ -43,6 +48,9 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     public AbstractMenu(@NotNull P plugin, @NotNull JYML cfg, @NotNull String path) {
         this(plugin, cfg.getString(path + "Title", ""), cfg.getInt(path + "Size"));
         this.cfg = cfg;
+        this.setInventoryType(JOption.create("Inventory_Type", InventoryType.class, InventoryType.CHEST,
+            "Sets Inventory Type for the GUI.",
+            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/inventory/InventoryType.html").read(cfg));
     }
 
     public AbstractMenu(@NotNull P plugin, @NotNull String title, int size) {
@@ -54,6 +62,7 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
         this.id = UUID.randomUUID();
         this.title = title;
         this.setSize(size);
+        this.setInventoryType(InventoryType.CHEST);
 
         this.items = new LinkedHashMap<>();
         this.userItems = new WeakHashMap<>();
@@ -114,7 +123,7 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
             inventory = player.getOpenInventory().getTopInventory();
             inventory.clear();
         } else {
-            inventory = this.createInventory();
+            inventory = this.createInventory(player);
         }
 
         this.setPage(player, page, page);
@@ -171,7 +180,6 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
     public void onItemPrepare(@NotNull Player player, @NotNull MenuItem menuItem, @NotNull ItemStack item) {
         item.editMeta(meta -> {
             // Support PAPI placeholders
@@ -222,6 +230,15 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     }
 
     @Override
+    public @NotNull Component getTitle(@NotNull Player player) {
+        Component title = this.getTitle();
+        if (Hooks.hasPlaceholderAPI()) {
+            title = PlaceholderHook.setPlaceholders(player, title);
+        }
+        return title;
+    }
+
+    @Override
     public void setTitle(@NotNull Component title) {
         this.title = title;
     }
@@ -234,6 +251,16 @@ public abstract class AbstractMenu<P extends NexPlugin<P>> extends AbstractListe
     @Override
     public void setSize(int size) {
         this.size = size;
+    }
+
+    @Override
+    public @NotNull InventoryType getInventoryType() {
+        return inventoryType;
+    }
+
+    @Override
+    public void setInventoryType(@NotNull InventoryType inventoryType) {
+        this.inventoryType = inventoryType;
     }
 
     @Override

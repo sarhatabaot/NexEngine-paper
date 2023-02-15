@@ -66,11 +66,11 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains:annotations:23.1.0")
+    implementation("org.jetbrains:annotations:24.0.0")
 }
 
 group = "su.nexmedia"
-version = "2.2.8"
+version = "2.2.9"
 
 java {
     toolchain {

@@ -6,6 +6,7 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.AbstractManager;
 import su.nexmedia.engine.api.module.AbstractModule;
+import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.ResourceExtractor;
 import su.nexmedia.engine.utils.StringUtil;
@@ -17,10 +18,10 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
 
     private JYML config;
 
-    public String   pluginName;
-    public String   pluginPrefix;
+    public String pluginName;
+    public String pluginPrefix;
     public String[] commandAliases;
-    public String   languageCode;
+    public String languageCode;
 
     public ConfigManager(@NotNull P plugin) {
         super(plugin);
@@ -28,26 +29,26 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
 
     @Override
     protected void onLoad() {
-        JYML cfg = this.getConfig();
+        this.config = JYML.loadOrExtract(this.plugin, "config.yml");
 
         this.pluginName = JOption.create("Plugin.Name", plugin.getName(),
-            "Localized plugin name. It's used in messages and with internal placeholders.")
-            .read(cfg);
+                "Localized plugin name. It's used in messages and with internal placeholders.")
+            .read(config);
         this.pluginPrefix = JOption.create("Plugin.Prefix", "<yellow>" + Placeholders.Plugin.NAME + " <dark_gray>» <gray>",
-            "Plugin prefix. Used in messages.",
-            "You can use " + Placeholders.Plugin.NAME_LOCALIZED + " placeholder for a plugin name.")
-            .read(cfg).replace(Placeholders.Plugin.NAME, this.pluginName);
+                "Plugin prefix. Used in messages.",
+                "You can use " + Placeholders.Plugin.NAME_LOCALIZED + " placeholder for a plugin name.")
+            .read(config).replace(Placeholders.Plugin.NAME, this.pluginName);
         this.commandAliases = JOption.create("Plugin.Command_Aliases", plugin.getName().toLowerCase(),
-            "Command names that will be registered as main plugin commands.",
-            "Do not leave this empty. Split multiple names with a comma.")
-            .read(cfg).split(",");
+                "Command names that will be registered as main plugin commands.",
+                "Do not leave this empty. Split multiple names with a comma.")
+            .read(config).split(",");
         this.languageCode = JOption.create("Plugin.Language", "en",
-            "Sets the plugin language.",
-            "It will use language config from the '/lang/' sub-folder for specified language code.",
-            "By default it's 'en', so 'messages_en.yml' will be used.")
-            .read(cfg).toLowerCase();
+                "Sets the plugin language.",
+                "It will use language config from the '" + LangManager.DIR_LANG + "' sub-folder for specified language code.",
+                "By default it's 'en', so 'messages_en.yml' will be used.")
+            .read(config).toLowerCase();
 
-        this.getConfig().saveChanges();
+        this.config.saveChanges();
     }
 
     @Override
@@ -57,9 +58,9 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
 
     @NotNull
     public JYML getConfig() {
-        if (this.config == null) {
+        /*if (this.config == null) {
             this.config = JYML.loadOrExtract(this.plugin, "config.yml");
-        }
+        }*/
         return this.config;
     }
 
@@ -90,7 +91,7 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
     }
 
     public void extractResources(@NotNull String folder) {
-        this.extractResources(folder,plugin.getDataFolder() + folder, false);
+        this.extractResources(folder, plugin.getDataFolder() + folder, false);
     }
 
     public void extractResources(@NotNull String jarPath, @NotNull String toPath) {
@@ -111,8 +112,7 @@ public class ConfigManager<P extends NexPlugin<P>> extends AbstractManager<P> {
         ResourceExtractor extract = ResourceExtractor.create(plugin, jarPath, destination);
         try {
             extract.extract(override);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

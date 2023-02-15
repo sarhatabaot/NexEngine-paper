@@ -2,13 +2,14 @@ package su.nexmedia.engine.api.data;
 
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public class DataTypes {
 
-    public static final DataString  STRING  = new DataString();
-    public static final DataChar    CHAR    = new DataChar();
+    public static final DataString STRING = new DataString();
+    public static final DataChar CHAR = new DataChar();
     public static final DataInteger INTEGER = new DataInteger();
-    public static final DataDouble  DOUBLE  = new DataDouble();
-    public static final DataLong    LONG    = new DataLong();
+    public static final DataDouble DOUBLE = new DataDouble();
+    public static final DataLong LONG = new DataLong();
     public static final DataBoolean BOOLEAN = new DataBoolean();
 
     public static class DataString {
@@ -60,17 +61,15 @@ public class DataTypes {
             String type;
 
             if (length < 1 || dataType == StorageType.SQLITE) {
-                type =  "INTEGER NOT NULL";
-            }
-            else {
+                type = "INTEGER NOT NULL";
+            } else {
                 type = "int(" + length + ") NOT NULL";
             }
 
             if (autoInc) {
                 if (dataType == StorageType.SQLITE) {
                     type += " PRIMARY KEY AUTOINCREMENT";
-                }
-                else {
+                } else {
                     type += " PRIMARY KEY AUTO_INCREMENT";
                 }
             }

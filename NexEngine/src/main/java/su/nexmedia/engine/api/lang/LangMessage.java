@@ -13,6 +13,7 @@ import su.nexmedia.engine.utils.message.NexParser;
 import su.nexmedia.engine.utils.regex.RegexUtil;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -35,7 +36,7 @@ public class LangMessage {
         PREFIX("prefix"),
         SOUND("sound"),
         TYPE("type"),
-        PLACEHOLDER_API("papi");
+        ;
 
         private final Pattern pattern;
 
@@ -175,6 +176,7 @@ public class LangMessage {
         return this.replace(str -> str.replace(var, String.valueOf(replacer)));
     }
 
+    @Deprecated
     public @NotNull LangMessage replace(@NotNull String var, @NotNull List<Object> replacer) {
         if (this.isEmpty()) return this;
         return this.replace(str -> str.replace(var, String.join("\\n", replacer.stream().map(Object::toString).toList())));
@@ -184,6 +186,23 @@ public class LangMessage {
         if (this.isEmpty()) return this;
         LangMessage msgCopy = new LangMessage(this);
         msgCopy.setLocalized(replacer.apply(msgCopy.getLocalized()));
+        return msgCopy;
+    }
+
+    @NotNull
+    public LangMessage replace(@NotNull Predicate<String> predicate, @NotNull BiConsumer<String, List<String>> replacer) {
+        if (this.isEmpty()) return this;
+
+        LangMessage msgCopy = new LangMessage(this);
+        List<String> replaced = new ArrayList<>();
+        msgCopy.asList().forEach(line -> {
+            if (predicate.test(line)) {
+                replacer.accept(line, replaced);
+                return;
+            }
+            replaced.add(line);
+        });
+        msgCopy.setLocalized(String.join("\\n", replaced));
         return msgCopy;
     }
 
@@ -246,16 +265,22 @@ public class LangMessage {
     }
 
     /**
-     * Replaces a literal '\n' newline splitter with a system one.
+     * Replaces plain '\n' line breaker with a system one.
      *
-     * @return A string with a system new line splitters.
+     * @return A string with a system lin breakers.
      */
     public @NotNull String normalizeLines() {
         return String.join("\n", this.asList());
     }
 
-    private @NotNull UnaryOperator<String> replaceDefaults() {
-        return str -> Placeholders.Plugin.replacer(plugin).apply(str);
+    @NotNull
+    private UnaryOperator<String> replaceDefaults() {
+        return str -> {
+            for (Map.Entry<String, String> entry : this.plugin.getLangManager().getPlaceholders().entrySet()) {
+                str = str.replace(entry.getKey(), entry.getValue());
+            }
+            return Placeholders.Plugin.replacer(plugin).apply(str);
+        };
     }
 
     public enum OutputType {

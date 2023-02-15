@@ -4,32 +4,34 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.ComponentUtil;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public class JOption<T> {
 
-    public static final Reader<Boolean>         READER_BOOLEAN        = JYML::getBoolean;
-    public static final Reader<Integer>         READER_INT            = JYML::getInt;
-    public static final Reader<Double>          READER_DOUBLE         = JYML::getDouble;
-    public static final Reader<Long>            READER_LONG           = JYML::getLong;
-    public static final Reader<String>          READER_STRING         = JYML::getString;
-    public static final Reader<Set<String>>     READER_SET_STRING     = (cfg, path, def) -> cfg.getStringSet(path);
-    public static final Reader<List<String>>    READER_LIST_STRING    = (cfg, path, def) -> cfg.getStringList(path);
-    public static final Reader<Component>       READER_COMPONENT      = (cfg, path, def) -> cfg.getComponent(path);
+    public static final Reader<Boolean> READER_BOOLEAN = JYML::getBoolean;
+    public static final Reader<Integer> READER_INT = JYML::getInt;
+    public static final Reader<Double> READER_DOUBLE = JYML::getDouble;
+    public static final Reader<Long> READER_LONG = JYML::getLong;
+    public static final Reader<String> READER_STRING = JYML::getString;
+    public static final Reader<Set<String>> READER_SET_STRING = (cfg, path, def) -> cfg.getStringSet(path);
+    public static final Reader<List<String>> READER_LIST_STRING = (cfg, path, def) -> cfg.getStringList(path);
+    public static final Reader<Component> READER_COMPONENT = (cfg, path, def) -> cfg.getComponent(path);
     public static final Reader<List<Component>> READER_LIST_COMPONENT = (cfg, path, def) -> cfg.getComponentList(path);
-    public static final Reader<ItemStack>       READER_ITEM           = JYML::getItem;
+    public static final Reader<ItemStack> READER_ITEM = JYML::getItem;
 
-    protected final Reader<T> reader;
-    protected final String    path;
-    protected final T         defaultValue;
-    protected final String[]  description;
-    protected       T         value;
-    @Deprecated protected Writer     writer;
+    protected final String path;
+    protected final T defaultValue;
+    protected final String[] description;
+    protected T value;
+    @Deprecated protected Writer writer;
     protected IWriter<T> writerNew;
+    protected Reader<T> reader;
 
     public JOption(@NotNull String path, @NotNull Reader<T> reader, @NotNull Supplier<T> defaultValue, @NotNull String... description) {
         this(path, reader, defaultValue.get(), description);
@@ -84,7 +86,14 @@ public class JOption<T> {
 
     @NotNull
     public static <E extends Enum<E>> JOption<E> create(@NotNull String path, @NotNull Class<E> clazz, @NotNull E defaultValue, @NotNull String... description) {
-        return new JOption<>(path, ((cfg, path1, def) -> cfg.getEnum(path1, clazz, defaultValue)), defaultValue, description);
+        return new JOption<>(path, ((cfg, path1, def) -> cfg.getEnum(path1, clazz, defaultValue)), defaultValue, description)
+            .setWriter((cfg, path1, type) -> cfg.set(path1, type.name()));
+    }
+
+    @NotNull
+    public static JOption<SimpleParticle> create(@NotNull String path, @NotNull SimpleParticle defaulValue, @NotNull String... description) {
+        return new JOption<>(path, (cfg, path1, def) -> SimpleParticle.read(cfg, path1), defaulValue, description)
+            .setWriter((cfg, path1, particle) -> SimpleParticle.write(particle, cfg, path1));
     }
 
     @NotNull
@@ -109,11 +118,9 @@ public class JOption<T> {
     public void write(@NotNull JYML cfg) {
         if (this.getWriter() != null) {
             this.getWriter().write(cfg, this.getPath());
-        }
-        else if (this.getWriterNew() != null) {
+        } else if (this.getWriterNew() != null) {
             this.getWriterNew().write(cfg, this.getPath(), this.get());
-        }
-        else {
+        } else {
             cfg.set(this.getPath(), this.get());
         }
     }
@@ -133,8 +140,23 @@ public class JOption<T> {
     }
 
     @NotNull
+    @Deprecated
     public JOption.Reader<T> getValueLoader() {
+        return this.getReader();
+    }
+
+    @NotNull
+    public Reader<T> getReader() {
         return reader;
+    }
+
+    @NotNull
+    public JOption<T> mapReader(@NotNull UnaryOperator<T> operator) {
+        if (this.reader == null) return this;
+
+        Reader<T> readerHas = this.reader;
+        this.reader = (cfg, path1, def) -> operator.apply(readerHas.read(cfg, path1, def));
+        return this;
     }
 
     @NotNull

@@ -17,15 +17,12 @@ import su.nexmedia.engine.hooks.misc.PlaceholderHook;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class ItemUtil {
 
-    private static final NexEngine ENGINE;
-
-    static {
-        ENGINE = NexEngine.get();
-    }
+    private static final NexEngine ENGINE = NexEngine.get();
 
     public static int addToLore(@NotNull List<String> lore, int pos, @NotNull String value) {
         if (pos >= lore.size() || pos < 0) {
@@ -44,6 +41,14 @@ public class ItemUtil {
     public static @NotNull List<Component> getLore(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         return meta != null && meta.hasLore() ? Objects.requireNonNull(meta.lore()) : new ArrayList<>();
+    }
+
+    public static void mapMeta(@NotNull ItemStack item, @NotNull Consumer<ItemMeta> function) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
+        function.accept(meta);
+        item.setItemMeta(meta);
     }
 
     public static void setSkullTexture(@NotNull ItemStack item, @NotNull String value) {

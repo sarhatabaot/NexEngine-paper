@@ -33,11 +33,11 @@ public abstract class NexPlugin<P extends NexPlugin<P>> extends JavaPlugin imple
 
     public static boolean isPaper = false;
 
-    protected ConfigManager<P>  configManager;
-    protected LangManager<P>    langManager;
+    protected ConfigManager<P> configManager;
+    protected LangManager<P> langManager;
     protected CommandManager<P> commandManager;
 
-    private Logger  logger;
+    private Logger logger;
     private boolean isEngine;
 
     @NotNull
@@ -70,8 +70,7 @@ public abstract class NexPlugin<P extends NexPlugin<P>> extends JavaPlugin imple
                 this.getPluginManager().disablePlugin(this);
                 return;
             }
-        }
-        else {
+        } else {
             engine.addChildren(this);
             this.info("Powered by: " + engine.getName());
         }
@@ -129,8 +128,7 @@ public abstract class NexPlugin<P extends NexPlugin<P>> extends JavaPlugin imple
                 if (this.getPluginManager().getPermission(permission.getName()) == null) {
                     this.getPluginManager().addPermission(permission);
                 }
-            }
-            catch (IllegalAccessException | IllegalArgumentException e) {
+            } catch (IllegalAccessException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -292,12 +290,42 @@ public abstract class NexPlugin<P extends NexPlugin<P>> extends JavaPlugin imple
         return this.getClassLoader();
     }
 
+    @Deprecated
     public final void runTask(@NotNull Consumer<BukkitTask> consume, boolean async) {
         if (async) {
             this.getServer().getScheduler().runTaskAsynchronously(this, consume);
-        }
-        else {
+        } else {
             this.getServer().getScheduler().runTask(this, consume);
         }
     }
+
+    public void runTask(@NotNull Consumer<BukkitTask> consumer) {
+        this.getScheduler().runTask(this, consumer);
+    }
+
+    @Deprecated
+    public void runTaskAsynchronously(@NotNull Consumer<BukkitTask> consumer) {
+        this.runTaskAsync(consumer);
+    }
+
+    public void runTaskAsync(@NotNull Consumer<BukkitTask> consumer) {
+        this.getScheduler().runTaskAsynchronously(this, consumer);
+    }
+
+    public void runTaskLater(@NotNull Consumer<BukkitTask> consumer, long delay) {
+        this.getScheduler().runTaskLater(this, consumer, delay);
+    }
+
+    public void runTaskLaterAsync(@NotNull Consumer<BukkitTask> consumer, long delay) {
+        this.getScheduler().runTaskLaterAsynchronously(this, consumer, delay);
+    }
+
+    public void runTaskTimer(@NotNull Consumer<BukkitTask> consumer, long delay, long interval) {
+        this.getScheduler().runTaskTimer(this, consumer, delay, interval);
+    }
+
+    public void runTaskTimerAsync(@NotNull Consumer<BukkitTask> consumer, long delay, long interval) {
+        this.getScheduler().runTaskTimerAsynchronously(this, consumer, delay, interval);
+    }
+
 }

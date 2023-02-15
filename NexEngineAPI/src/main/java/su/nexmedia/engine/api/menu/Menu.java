@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -51,8 +52,23 @@ public interface Menu<P> {
         return this.getViewers().contains(player);
     }
 
+    @NotNull Component getTitle(@NotNull Player player);
+
+    @NotNull InventoryType getInventoryType();
+
+    void setInventoryType(@NotNull InventoryType inventoryType);
+
     default @NotNull Inventory createInventory() {
         return Bukkit.getServer().createInventory(null, this.getSize(), this.getTitle());
+    }
+
+    default @NotNull Inventory createInventory(@NotNull Player player) {
+        Component title = this.getTitle(player);
+        if (this.getInventoryType() == InventoryType.CHEST) {
+            return Bukkit.getServer().createInventory(null, this.getSize(), title);
+        } else {
+            return Bukkit.getServer().createInventory(null, this.getInventoryType(), title);
+        }
     }
 
     default @NotNull List<MenuItem> getUserItems(@NotNull Player player) {

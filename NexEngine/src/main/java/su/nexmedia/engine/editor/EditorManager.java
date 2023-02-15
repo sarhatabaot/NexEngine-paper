@@ -20,6 +20,7 @@ import su.nexmedia.engine.api.manager.IListener;
 import su.nexmedia.engine.api.menu.AbstractMenu;
 import su.nexmedia.engine.lang.EngineLang;
 import su.nexmedia.engine.utils.CollectionsUtil;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nexmedia.engine.utils.StringUtil;
 
@@ -30,12 +31,12 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class EditorManager extends AbstractManager<NexEngine> implements IListener {
 
-    private static final NexEngine                                        ENGINE             = NexEngine.get();
-    private static final Map<Player, Map.Entry<AbstractMenu<?>, Integer>> EDITOR_CACHE_MENU  = new WeakHashMap<>();
-    private static final Map<Player, EditorObject<?, ?>>                  EDITOR_CACHE_INPUT = new WeakHashMap<>();
+    private static final NexEngine ENGINE = NexEngine.get();
+    private static final Map<Player, Map.Entry<AbstractMenu<?>, Integer>> EDITOR_CACHE_MENU = new WeakHashMap<>();
+    private static final Map<Player, EditorObject<?, ?>> EDITOR_CACHE_INPUT = new WeakHashMap<>();
 
-    private static final String EXIT       = "#exit";
-    private static final int    TITLE_STAY = Short.MAX_VALUE;
+    private static final String EXIT = "#exit";
+    private static final int TITLE_STAY = Short.MAX_VALUE;
 
     public EditorManager(@NotNull NexEngine plugin) {
         super(plugin);
@@ -112,7 +113,7 @@ public class EditorManager extends AbstractManager<NexEngine> implements IListen
                 if (autoRun && fixCommand && !item.startsWith("/")) item = "/" + item;
                 builder.clickEvent(
                     autoRun ? ClickEvent.runCommand(item)
-                            : ClickEvent.suggestCommand(item)
+                        : ClickEvent.suggestCommand(item)
                 );
                 return builder;
             })
@@ -125,19 +126,21 @@ public class EditorManager extends AbstractManager<NexEngine> implements IListen
     }
 
     public static void sendCommandTips(@NotNull Player player) {
-        String text = StringUtil.color("""
-                                       &7
-                                       &b&lCommand Syntax:
-                                       &2• &a'[CONSOLE] <command>' &2- Execute as Console.
-                                       &2• (no prefix) &a'<command>' &2- Execute as a Player.
-                                       &7
-                                       &b&lCommand Placeholders:
-                                       &2• &a%player_name% &2- For player name.
-                                       &7
-                                       &b&lCommand Examples:
-                                       &2▸ &a[CONSOLE] eco give %player_name% 250
-                                       &2▸ &abroadcast Hello!
-                                       &7""");
+        String text = Colorizer.legacy(
+            """
+            &7
+            &b&lCommand Syntax:
+            &2• &a'[CONSOLE] <command>' &2- Execute as Console.
+            &2• (no prefix) &a'<command>' &2- Execute as a Player.
+            &7
+            &b&lCommand Placeholders:
+            &2• &a%player_name% &2- For player name.
+            &7
+            &b&lCommand Examples:
+            &2▸ &a[CONSOLE] eco give %player_name% 250
+            &2▸ &abroadcast Hello!
+            &7"""
+        );
         player.sendMessage(text);
     }
 

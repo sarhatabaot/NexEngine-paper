@@ -1,15 +1,15 @@
 package su.nexmedia.engine.api.task;
 
 import org.jetbrains.annotations.NotNull;
-
 import su.nexmedia.engine.NexPlugin;
 
+@Deprecated
 public abstract class AbstractTask<P extends NexPlugin<P>> {
 
     @NotNull
-    protected P       plugin;
-    protected int     id;
-    protected long    interval;
+    protected P plugin;
+    protected int id;
+    protected long interval;
     protected boolean async;
 
     public AbstractTask(@NotNull P plugin, int interval, boolean async) {
@@ -29,8 +29,7 @@ public abstract class AbstractTask<P extends NexPlugin<P>> {
 
         if (async) {
             this.async();
-        }
-        else {
+        } else {
             this.sync();
         }
     }

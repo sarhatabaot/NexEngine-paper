@@ -4,7 +4,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nexmedia.engine.utils.StringUtil;
+import su.nexmedia.engine.utils.Colorizer;
 import su.nexmedia.engine.utils.regex.RegexUtil;
 
 import java.util.HashMap;
@@ -57,20 +57,18 @@ public class NexParser {
                 String matchOptions = matcher.group(1).trim();
                 String matchText = matcher.group(2);
                 message = message.replace(matchFull, matchText);
-            }
-            else message = message.replace(matchFull, "");
+            } else message = message.replace(matchFull, "");
         }
         return message;
     }
 
     public static String[] getPlainParts(@NotNull String message) {
-        //message = StringUtil.color(message.replace("\n", " "));
         return PATTERN_OPTIONS.split(message);
     }
 
     @NotNull
     public static NexMessage toMessage(@NotNull String message) {
-        message = StringUtil.color(message);
+        message = Colorizer.legacy(message);
 
         Matcher matcher = RegexUtil.getMatcher(PATTERN_OPTIONS, message);
         Map<String, String> parameters = new HashMap<>();
@@ -117,4 +115,5 @@ public class NexParser {
 
         return matcher.group(1).stripLeading();
     }
+
 }

@@ -12,18 +12,16 @@ import java.sql.SQLException;
 public abstract class AbstractDataConnector {
 
     protected final NexPlugin<?> plugin;
-    protected final String       url;
+    protected final String url;
     protected final HikariConfig config;
     protected final HikariDataSource dataSource;
-
-    // хочу сказать спасибо всем с stackoverflow, cyberforum, spigotmc и остальным!!
 
     public AbstractDataConnector(@NotNull NexPlugin<?> plugin, @NotNull String url) {
         this(plugin, url, null, null);
     }
 
     public AbstractDataConnector(@NotNull NexPlugin<?> plugin, @NotNull String url,
-                                 @Nullable String userName, @Nullable String password) {
+        @Nullable String userName, @Nullable String password) {
         this.plugin = plugin;
         this.url = url;
 

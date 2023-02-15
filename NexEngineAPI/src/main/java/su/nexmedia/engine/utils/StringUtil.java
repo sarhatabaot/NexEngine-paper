@@ -1,7 +1,5 @@
 package su.nexmedia.engine.utils;
 
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +14,8 @@ import java.util.stream.Stream;
 
 public class StringUtil {
 
-    public static final char AMPERSAND_CHAR = LegacyComponentSerializer.AMPERSAND_CHAR;
-
-    @Deprecated public static final Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]{6})");
+    @Deprecated
+    public static final Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]{6})");
 
     @Contract(pure = true)
     public static @NotNull String oneSpace(@NotNull String str) {
@@ -32,17 +29,23 @@ public class StringUtil {
     /**
      * Translates ampersand ({@code &}) color codes into section ({@code §}) color codes.
      * <p>
-     * The translation supports three different RGB formats: 1) Legacy Mojang color and formatting codes (such as §a or
-     * §l), 2) Adventure-specific RGB format (such as §#a25981) and  3) BungeeCord RGB color code format (such as
-     * §x§a§2§5§9§8§1).
+     * The translation supports three different RGB formats:
+     * <ul>
+     *     <li>Legacy Mojang color and formatting codes (such as §a or §l)</li>
+     *     <li>Adventure-specific RGB format (such as §#a25981)</li>
+     *     <li>BungeeCord RGB color code format (such as §x§a§2§5§9§8§1)</li>
+     * </ul>
      *
      * @param str a legacy text where its color codes are in <b>ampersand</b> {@code &} format
      *
      * @return a legacy text where its color codes are in <b>section</b> {@code §} format
+     *
+     * @deprecated in favor of {@link Colorizer#legacy(String)}
      */
+    @Deprecated
     @Contract(pure = true)
     public static @NotNull String color(@NotNull String str) {
-        return LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy(AMPERSAND_CHAR).deserialize(str));
+        return Colorizer.legacy(str);
     }
 
     /**
@@ -52,21 +55,10 @@ public class StringUtil {
      *
      * @return a plain text
      */
+    @Deprecated
     @Contract(pure = true)
     public static @NotNull String asPlainText(@NotNull String legacy) {
-        return ChatColor.stripColor(legacy);
-    }
-
-    /**
-     * Removes color duplication.
-     *
-     * @param str a string to fix
-     *
-     * @return a string with a proper color codes formatting
-     */
-    @Contract(pure = true)
-    public static @NotNull String colorFix(@NotNull String str) {
-        return str; // Return as it is since it's a Bukkit legacy
+        return Colorizer.strip(legacy);
     }
 
     @Contract(pure = true)
@@ -84,36 +76,22 @@ public class StringUtil {
         return Color.fromRGB(red, green, blue);
     }
 
-    /**
-     * @deprecated in favor of {@link #color(String)}
-     */
     @Deprecated
     @Contract(pure = true)
-    public static @NotNull String colorHex(@NotNull String str) {
-        return color(str);
-    }
-
-    @Contract(pure = true)
-    public static @NotNull String colorHexRaw(@NotNull String str) {
-        return LegacyComponentSerializer.legacyAmpersand().serialize(LegacyComponentSerializer.legacySection().deserialize(str));
-    }
-
-    @Contract(pure = true)
     public static @NotNull String colorRaw(@NotNull String str) {
-        return str.replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR);
+        return Colorizer.plain(str);
     }
 
     @Deprecated
     @Contract(pure = false)
     public static @NotNull List<String> color(@NotNull List<String> list) {
-        list.replaceAll(StringUtil::color);
-        return list;
+        return Colorizer.apply(list);
     }
 
     @Deprecated
     @Contract(pure = true)
-    public static @NotNull Set<String> color(@NotNull Set<String> list) {
-        return new HashSet<>(color(new ArrayList<>(list)));
+    public static @NotNull Set<String> color(@NotNull Set<String> set) {
+        return Colorizer.apply(set);
     }
 
     /**
@@ -287,6 +265,18 @@ public class StringUtil {
         return array;
     }
 
+    public static <T extends Enum<T>> @NotNull Optional<T> getEnum(@NotNull String str, @NotNull Class<T> clazz) {
+        try {
+            return Optional.of(Enum.valueOf(clazz, str.toUpperCase()));
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
+    }
+
+    public static @NotNull String capitalizeUnderscored(@NotNull String str) {
+        return capitalizeFully(str.replace("_", " "));
+    }
+
     public static @NotNull String capitalizeFully(@NotNull String str) {
         if (str.length() != 0) {
             str = str.toLowerCase();
@@ -414,4 +404,5 @@ public class StringUtil {
         }
         return String.valueOf(dec);
     }
+
 }

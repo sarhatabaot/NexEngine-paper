@@ -38,8 +38,9 @@ public class PlayerUtil {
     }
 
     @NotNull
+    @Deprecated
     public static List<String> getPlayerNames() {
-        return Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+        return CollectionsUtil.playerNames();
     }
 
     public static boolean hasEmptyInventory(@NotNull Player player) {
@@ -66,8 +67,7 @@ public class PlayerUtil {
     public static int countItem(@NotNull Player player, @NotNull Predicate<ItemStack> predicate) {
         return Stream.of(player.getInventory().getStorageContents())
             .filter(item -> item != null && !item.getType().isAir() && predicate.test(item))
-            .mapToInt(ItemStack::getAmount)
-            .sum();
+            .mapToInt(ItemStack::getAmount).sum();
     }
 
     public static int countItem(@NotNull Player player, @NotNull ItemStack item) {
@@ -126,24 +126,14 @@ public class PlayerUtil {
         Arrays.asList(items).forEach(item -> addItem(player, item, item.getAmount()));
     }
 
-    public static void addItem(@NotNull Player player, @NotNull ItemStack add, int amount) {
-        if (amount <= 0 || add.getType().isAir()) return;
+    public static void addItem(@NotNull Player player, @NotNull ItemStack item2, int amount) {
+        if (amount <= 0 || item2.getType().isAir()) return;
 
-        Inventory inventory = player.getInventory();
         World world = player.getWorld();
-
-        ItemStack item = add.clone();
-        item.setAmount(1);
-
-        int space = countItemSpace(player, item);
-        int toAdd = Math.min(space, amount);
-        int toDrop = amount - toAdd;
-
-        for (int count = 0; count < toAdd; count++) {
-            inventory.addItem(item);
-        }
-        for (int count = 0; count < toDrop; count++) {
-            world.dropItem(player.getLocation(), item);
-        }
+        ItemStack item = item2.clone();
+        item.setAmount(amount);
+        player.getInventory().addItem(item).values().forEach(left -> {
+            world.dropItem(player.getLocation(), left);
+        });
     }
 }

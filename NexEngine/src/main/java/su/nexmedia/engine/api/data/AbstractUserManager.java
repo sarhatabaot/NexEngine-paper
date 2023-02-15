@@ -13,6 +13,7 @@ import su.nexmedia.engine.api.manager.AbstractManager;
 import su.nexmedia.engine.hooks.Hooks;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends AbstractUser<P>> extends AbstractManager<P> {
 
@@ -43,9 +44,11 @@ public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends Abst
     }
 
     /**
-     * Gets the preloaded user data for specified player.
-     * Throwns an exception if user data is not loaded for the player, because it have to be loaded on player login.
+     * Gets the preloaded user data for specified player. Throwns an exception if user data is not loaded for the
+     * player, because it have to be loaded on player login.
+     *
      * @param player A player instance to get user data for.
+     *
      * @return User data for the specified player.
      */
     @NotNull
@@ -66,9 +69,11 @@ public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends Abst
     }
 
     /**
-     * Attempts to load user data from online player with that Name (if there is any).
-     * In case if no such player is online, attempts to load data from the database.
+     * Attempts to load user data from online player with that Name (if there is any). In case if no such player is
+     * online, attempts to load data from the database.
+     *
      * @param name A user name to load data for.
+     *
      * @return User data for the specified user name.
      */
     @Nullable
@@ -90,9 +95,11 @@ public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends Abst
     }
 
     /**
-     * Attempts to load user data from online player with that UUID (if there is any).
-     * In case if no such player is online, attempts to load data from the database.
+     * Attempts to load user data from online player with that UUID (if there is any). In case if no such player is
+     * online, attempts to load data from the database.
+     *
      * @param uuid A user unique id to load data for.
+     *
      * @return User data for the specified uuid.
      */
     @Nullable
@@ -107,6 +114,14 @@ public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends Abst
         }
 
         return user;
+    }
+
+    public final CompletableFuture<U> getUserDataAsync(@NotNull String name) {
+        return CompletableFuture.supplyAsync(() -> this.getUserData(name));
+    }
+
+    public final CompletableFuture<U> getUserDataAsync(@NotNull UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> this.getUserData(uuid));
     }
 
     public final void unloadUser(@NotNull Player player) {
@@ -167,8 +182,7 @@ public abstract class AbstractUserManager<P extends NexPlugin<P>, U extends Abst
                 dataHolder.getData().addUser(user);
                 plugin.info("Created new user data for: '" + uuid + "'");
                 return;
-            }
-            else {
+            } else {
                 user = getUserData(uuid);
             }
 

@@ -10,30 +10,29 @@ import org.jetbrains.annotations.Nullable;
 public class EffectUtil {
 
     @Nullable
+    @Deprecated
     private static Object getParticleData(@NotNull Particle particle, @NotNull String dataRaw) {
         if (particle == Particle.REDSTONE || particle == Particle.SPELL_MOB || particle == Particle.SPELL_MOB_AMBIENT) {
             Color color = dataRaw.isEmpty() ? Color.WHITE : StringUtil.parseColor(dataRaw);
             return new Particle.DustOptions(color, 1.5f);
-        }
-        else if (particle == Particle.DUST_COLOR_TRANSITION) {
+        } else if (particle == Particle.DUST_COLOR_TRANSITION) {
             String[] colors = dataRaw.split(":");
             Color colorStart = dataRaw.isEmpty() ? Color.WHITE : StringUtil.parseColor(colors[0]);
             Color colorEnd = dataRaw.isEmpty() || colors.length < 2 ? Color.WHITE : StringUtil.parseColor(colors[1]);
             return new Particle.DustTransition(colorStart, colorEnd, 1.5f);
-        }
-        else if (particle == Particle.BLOCK_CRACK || particle == Particle.FALLING_DUST || particle == Particle.BLOCK_DUST) {
+        } else if (particle == Particle.BLOCK_CRACK || particle == Particle.FALLING_DUST || particle == Particle.BLOCK_DUST) {
             Material material = !dataRaw.isEmpty() ? Material.getMaterial(dataRaw) : Material.STONE;
             return material != null ? material.createBlockData() : Material.STONE.createBlockData();
-        }
-        else if (particle == Particle.ITEM_CRACK) {
+        } else if (particle == Particle.ITEM_CRACK) {
             Material material = !dataRaw.isEmpty() ? Material.getMaterial(dataRaw) : Material.STONE;
             return material != null ? new ItemStack(material) : new ItemStack(Material.STONE);
         }
         return null;
     }
 
+    @Deprecated
     public static void playEffect(@NotNull Location location, @NotNull String nameRaw, @NotNull String dataRaw,
-                                  double xOffset, double yOffset, double zOffset, double speed, int amount) {
+        double xOffset, double yOffset, double zOffset, double speed, int amount) {
 
         World world = location.getWorld();
         if (world == null) return;
@@ -44,8 +43,9 @@ public class EffectUtil {
         playEffect(location, particle, dataRaw, xOffset, yOffset, zOffset, speed, amount);
     }
 
+    @Deprecated
     public static void playEffect(@NotNull Player player, @NotNull Location location, @NotNull String nameRaw, @NotNull String dataRaw,
-                                  double xOffset, double yOffset, double zOffset, double speed, int amount) {
+        double xOffset, double yOffset, double zOffset, double speed, int amount) {
 
         Particle particle = CollectionsUtil.getEnum(nameRaw, Particle.class);
         if (particle == null || particle.name().equalsIgnoreCase("VIBRATION")) return;
@@ -53,8 +53,9 @@ public class EffectUtil {
         playEffect(player, location, particle, dataRaw, xOffset, yOffset, zOffset, speed, amount);
     }
 
+    @Deprecated
     public static void playEffect(@NotNull Player player, @NotNull Location location, @Nullable Particle particle, @NotNull String dataRaw,
-                                  double xOffset, double yOffset, double zOffset, double speed, int amount) {
+        double xOffset, double yOffset, double zOffset, double speed, int amount) {
         if (particle == null) return;
 
         Object data = getParticleData(particle, dataRaw);
@@ -67,8 +68,7 @@ public class EffectUtil {
             xOffset = color.getRed() / 255D;
             yOffset = color.getGreen() / 255D;
             zOffset = color.getBlue() / 255D;
-        }
-        else if (particle == Particle.NOTE) {
+        } else if (particle == Particle.NOTE) {
             amount = 0;
             speed = 1D;
             xOffset = StringUtil.getInteger(dataRaw, 0) / 24D;
@@ -78,8 +78,9 @@ public class EffectUtil {
         player.spawnParticle(particle, location, amount, xOffset, yOffset, zOffset, speed, data);
     }
 
+    @Deprecated
     public static void playEffect(@NotNull Location location, @Nullable Particle particle, @NotNull String dataRaw,
-                                  double xOffset, double yOffset, double zOffset, double speed, int amount) {
+        double xOffset, double yOffset, double zOffset, double speed, int amount) {
         if (particle == null) return;
 
         World world = location.getWorld();
@@ -95,8 +96,7 @@ public class EffectUtil {
             xOffset = color.getRed() / 255D;
             yOffset = color.getGreen() / 255D;
             zOffset = color.getBlue() / 255D;
-        }
-        else if (particle == Particle.NOTE) {
+        } else if (particle == Particle.NOTE) {
             amount = 0;
             speed = 1D;
             xOffset = StringUtil.getInteger(dataRaw, 0) / 24D;
@@ -106,9 +106,26 @@ public class EffectUtil {
         world.spawnParticle(particle, location, amount, xOffset, yOffset, zOffset, speed, data);
     }
 
+    public static void playParticle(@NotNull Location location, @NotNull Particle particle, @Nullable Object data,
+        double xOffset, double yOffset, double zOffset, double speed, int amount) {
+        World world = location.getWorld();
+        if (world == null) return;
+
+        if (data == null) {
+            world.spawnParticle(particle, location, amount, xOffset, yOffset, zOffset, speed);
+        } else world.spawnParticle(particle, location, amount, xOffset, yOffset, zOffset, speed, data);
+    }
+
+    public static void playParticle(@NotNull Player player, @NotNull Location location, @NotNull Particle particle, @Nullable Object data,
+        double xOffset, double yOffset, double zOffset, double speed, int amount) {
+        if (data == null) {
+            player.spawnParticle(particle, location, amount, xOffset, yOffset, zOffset, speed);
+        } else player.spawnParticle(particle, location, amount, xOffset, yOffset, zOffset, speed, data);
+    }
+
     public static void drawLine(@NotNull Location from, @NotNull Location to,
-                                @NotNull String nameRaw, @NotNull String dataRaw,
-                                float offX, float offY, float offZ, float speed, int amount) {
+        @NotNull String nameRaw, @NotNull String dataRaw,
+        float offX, float offY, float offZ, float speed, int amount) {
         Particle particle = CollectionsUtil.getEnum(nameRaw, Particle.class);
         if (particle == null || particle.name().equalsIgnoreCase("VIBRATION")) return;
 
@@ -116,8 +133,8 @@ public class EffectUtil {
     }
 
     public static void drawLine(@NotNull Location from, @NotNull Location to,
-                                @NotNull Particle particle, @NotNull String dataRaw,
-                                float offX, float offY, float offZ, float speed, int amount) {
+        @NotNull Particle particle, @NotNull String dataRaw,
+        float offX, float offY, float offZ, float speed, int amount) {
         Location origin = from.clone();
         Vector target = new Location(to.getWorld(), to.getX(), to.getY(), to.getZ()).toVector();
         origin.setDirection(target.subtract(origin.toVector()));
