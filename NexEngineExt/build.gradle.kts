@@ -11,13 +11,12 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
-    // 3rd party plugins
-    //   that may contain random transitive dependencies
-    //   and shadowed libs that are not properly relocated
+    // My own library
+    compileOnlyApi("cc.mewcraft:MewCore:5.13.1")
+
+    // 3rd party plugins that may contain random transitive dependencies
     compileOnly("me.clip:placeholderapi:2.10.10")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
-        isTransitive = false
-    }
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6") {
         exclude("org.bukkit")
     }
@@ -25,12 +24,7 @@ dependencies {
         exclude("ch.ethz.globis.phtree")
     }
     compileOnly("org.geysermc.floodgate:api:2.2.0-SNAPSHOT")
-    compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
-    compileOnly("io.lumine:Mythic-Dist:5.2.1")
-    compileOnly("io.lumine:MythicLib-dist:1.5.1-SNAPSHOT")
-    compileOnly("net.Indyuce:MMOItems-API:6.9.2-SNAPSHOT")
-    compileOnly("net.leonardo_dgs:InteractiveBooks:1.6.3")
-    compileOnly("com.github.DieReicheErethons:Brewery:3.1.1")
+    compileOnly("io.lumine:Mythic-Dist:5.2.1") { isTransitive = false }
 }
 
 description = "NexEngineExt"

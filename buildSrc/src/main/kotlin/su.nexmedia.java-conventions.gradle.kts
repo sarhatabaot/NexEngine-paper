@@ -10,9 +10,7 @@ plugins {
 repositories {
     mavenLocal {
         content {
-            includeGroup("net.Indyuce")
-            includeGroup("net.leonardo_dgs")
-            includeGroup("com.github.DieReicheErethons")
+            includeGroup("cc.mewcraft")
         }
     }
     mavenCentral()
@@ -25,14 +23,7 @@ repositories {
     }
     maven("https://jitpack.io") {
         content {
-            includeGroup("com.github.LoneDev6")
-            includeGroup("com.github.DieReicheErethons")
             includeGroup("com.github.MilkBowl")
-        }
-    }
-    maven("https://nexus.phoenixdevt.fr/repository/maven-public/") {
-        content{
-            includeGroup("io.lumine")
         }
     }
     maven("https://mvn.lumine.io/repository/maven-public/") {
@@ -80,13 +71,12 @@ java {
 
 tasks {
     compileJava {
-        options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
-        options.release.set(17)
+        options.encoding = Charsets.UTF_8.name()
     }
     javadoc {
-        options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
+        options.encoding = Charsets.UTF_8.name()
     }
     processResources {
-        filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
+        filteringCharset = Charsets.UTF_8.name()
     }
 }

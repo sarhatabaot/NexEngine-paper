@@ -1,5 +1,7 @@
 package su.nexmedia.engine.api.config;
 
+import cc.mewcraft.mewcore.item.api.PluginItem;
+import cc.mewcraft.mewcore.item.api.PluginItemRegistry;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -20,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.NexEngine;
 import su.nexmedia.engine.NexPlugin;
 import su.nexmedia.engine.Version;
-import su.nexmedia.engine.api.item.PluginItem;
 import su.nexmedia.engine.api.menu.MenuItem;
 import su.nexmedia.engine.api.menu.MenuItemImpl;
 import su.nexmedia.engine.api.menu.MenuItemType;
@@ -486,12 +487,12 @@ public class JYML extends YamlConfiguration {
     @Nullable
     public ItemStack getPluginItem(@NotNull String path) {
         String reference = this.getString(path);
-        PluginItem<?> pluginItem = NexEngine.get().getPluginItemRegistry().fromReferenceNullable(reference);
+        PluginItem<?> pluginItem = PluginItemRegistry.get().fromReferenceNullable(reference);
         return pluginItem != null ? pluginItem.createItemStack() : null;
     }
 
     public void setPluginItem(@NotNull String path, @NotNull ItemStack item) {
-        PluginItem<?> pluginItem = NexEngine.get().getPluginItemRegistry().fromItemStackNullable(item);
+        PluginItem<?> pluginItem = PluginItemRegistry.get().fromItemStackNullable(item);
         if (pluginItem == null) {
             NexEngine.get().warn("Failed to write plugin item reference at: " + path);
             return;

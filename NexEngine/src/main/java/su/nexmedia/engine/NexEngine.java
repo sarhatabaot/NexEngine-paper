@@ -2,15 +2,10 @@ package su.nexmedia.engine;
 
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.GeneralCommand;
-import su.nexmedia.engine.api.item.PluginItemRegistry;
 import su.nexmedia.engine.api.menu.MenuItemType;
 import su.nexmedia.engine.config.EngineConfig;
 import su.nexmedia.engine.editor.EditorManager;
 import su.nexmedia.engine.hooks.Hooks;
-import su.nexmedia.engine.hooks.item.BreweryItem;
-import su.nexmedia.engine.hooks.item.InteractiveBooksItem;
-import su.nexmedia.engine.hooks.item.ItemsAdderItem;
-import su.nexmedia.engine.hooks.item.MMOItemsItem;
 import su.nexmedia.engine.hooks.misc.VaultHook;
 import su.nexmedia.engine.hooks.npc.CitizensHook;
 import su.nexmedia.engine.lang.EngineLang;
@@ -18,7 +13,6 @@ import su.nexmedia.engine.nms.NMS;
 import su.nexmedia.engine.utils.Reflex;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 public class NexEngine extends NexPlugin<NexEngine> {
@@ -28,7 +22,6 @@ public class NexEngine extends NexPlugin<NexEngine> {
 
     NMS nms;
     private EditorManager editorManager;
-    private PluginItemRegistry pluginItemRegistry;
 
     public NexEngine() {
         instance = this;
@@ -90,10 +83,6 @@ public class NexEngine extends NexPlugin<NexEngine> {
             this.editorManager = null;
         }
 
-        if (this.pluginItemRegistry != null) {
-            this.pluginItemRegistry.unregisterAll();
-        }
-
         if (Hooks.hasCitizens()) CitizensHook.shutdown();
         if (Hooks.hasVault()) VaultHook.shutdown();
     }
@@ -103,12 +92,6 @@ public class NexEngine extends NexPlugin<NexEngine> {
         if (Hooks.hasVault()) {
             VaultHook.setup(this);
         }
-
-        pluginItemRegistry = new PluginItemRegistry(this);
-        pluginItemRegistry.registerForConfig("itemsadder", () -> new ItemsAdderItem(this));
-        pluginItemRegistry.registerForConfig("mmoitems", () -> new MMOItemsItem(this));
-        pluginItemRegistry.registerForConfig("brewery", () -> new BreweryItem(this));
-        pluginItemRegistry.registerForConfig("interactivebooks", () -> new InteractiveBooksItem(this));
     }
 
     @Override
@@ -139,10 +122,6 @@ public class NexEngine extends NexPlugin<NexEngine> {
 
     public @NotNull Set<NexPlugin<?>> getChildrens() {
         return this.childrens;
-    }
-
-    public @NotNull PluginItemRegistry getPluginItemRegistry() {
-        return Objects.requireNonNull(pluginItemRegistry);
     }
 
 }
