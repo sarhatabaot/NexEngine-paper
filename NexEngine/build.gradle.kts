@@ -36,11 +36,11 @@ version = "$version".decorateVersion()
 
 bukkit {
     main = "su.nexmedia.engine.NexEngine"
-    name = project.name
+    name = "NexEngine"
     version = "${project.version}"
     apiVersion = "1.17"
     authors = listOf("NightExpress")
-    softDepend = listOf("Vault", "Citizens", "Brewery", "ItemsAdder", "MMOItems", "MythicLib", "InteractiveBooks")
+    softDepend = listOf("Vault", "Citizens", "MythicMobs")
     load = STARTUP
     libraries = listOf("com.zaxxer:HikariCP:5.0.1", "it.unimi.dsi:fastutil:8.5.11")
 }
@@ -50,6 +50,9 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
+    jar {
+        archiveClassifier.set("noshade")
+    }
     shadowJar {
         minimize {
             exclude(dependency("su.nexmedia:.*:.*"))
@@ -58,8 +61,13 @@ tasks {
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir"))
     }
-    jar {
-        archiveClassifier.set("noshade")
+    processResources {
+        filesMatching("**/paper-plugin.yml") {
+            expand(mapOf(
+                "version" to "${project.version}",
+                "description" to project.description
+            ))
+        }
     }
     register("deployJar") {
         doLast {
