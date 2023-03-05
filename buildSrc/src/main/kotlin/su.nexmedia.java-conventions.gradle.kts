@@ -8,11 +8,11 @@ plugins {
 }
 
 repositories {
-    mavenLocal {
-        content {
-            includeGroup("cc.mewcraft")
-        }
-    }
+//    mavenLocal {
+//        content {
+//            includeGroup("cc.mewcraft")
+//        }
+//    }
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") {
         content {

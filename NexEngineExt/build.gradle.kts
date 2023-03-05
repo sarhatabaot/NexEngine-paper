@@ -12,7 +12,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
 
     // My own library
-    compileOnlyApi("cc.mewcraft:MewCore:5.13.1")
+//    compileOnlyApi("cc.mewcraft:MewCore:5.13.1")
 
     // 3rd party plugins that may contain random transitive dependencies
     compileOnly("me.clip:placeholderapi:2.10.10")
